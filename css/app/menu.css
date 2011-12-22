@@ -1,0 +1,64 @@
+.gs-mainMenu {
+    position: relative;
+    left: 10px;
+    top: 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+    float: left;
+}
+
+.gs-menuMain {
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    border: 1px solid  #293a45;
+}
+
+.gs-menuMain:hover {
+    border: 1px solid #43515b;
+}
+
+.gs-subMenu {
+    list-style-type: none;
+    font-weight: bold;
+    font-size: 16px;
+    height: 0px;
+    display: none;
+}
+.gs-subMenu li {
+    position: relative;
+    display: inline;
+    padding: 0px;
+    background-color: rgba(0,0,0, .4);
+    border: 1px solid #293a45;
+}
+
+.gs-subMenu li:hover {
+    border-bottom: 1px white dashed;
+}
+
+.gs-subMenu a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.gs-subMenu1 {
+    left: 80px;
+    top: -10px;
+}
+
+.gs-subMenu2 {
+    left: 100px;
+    top: -10px;
+}
+
+.gs-subMenu3 {
+    left: 100px;
+    top: -10px;
+}
+
+.gs-subMenu4 {
+    left: 80px;
+    top: -10px;
+}

@@ -1,0 +1,43 @@
+.gs-zoomSliderContainer {
+    position: absolute;
+    display: block;
+    width: 80px;
+    height: 500px;
+    border: 1px solid #293a45;
+    top: 150px;
+    left: 20px;
+    border-radius: 3px;
+}
+
+.gs-zoomSlider {
+    border: 1px solid #293a45;
+    position: relative;
+    width: 100px;
+    height: 80px;
+    left: -10px;
+    background: rgba(0, 0, 0, .9);
+    z-index: 1;
+    border-radius: 3px;
+}
+
+.gs-zoomSlider:hover {
+    border: 1px solid #43515b;
+}
+
+
+.gs-zoomSliderTopIcon {
+    float: left;
+    width: 80px;
+    height: 80px;
+    background: url(../../images/sliderbackground.png) no-repeat;
+}
+
+.gs-zoomSliderBottomIcon {
+    float: right;
+    width: 80px;
+    height: 80px;
+    position: relative;
+    bottom: 0;
+    top: 330px;
+    background: url(../../images/sliderbackground.png) 0 100% no-repeat;
+}

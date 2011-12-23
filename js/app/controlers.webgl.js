@@ -1,11 +1,12 @@
-Game.Controllers.webgl = (function() {
+App.Controllers.webgl = (function() {
 
-    var
-    renderer,
-    appView,
+    var renderer;
+
+    var activeModels = [];
+    var activeView = [];
 
     // Game loop
-    loops = 0,
+    var loops = 0,
     nextGameTick = (new Date).getTime(),
 
     // Constants
@@ -25,7 +26,7 @@ Game.Controllers.webgl = (function() {
         */
         initialize: function() {
             _.bindAll( this, "animate", "render", "update" );
-             debugger;
+            debugger;
             // Initialize camera
             this.camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, -2000, 10000 );
             this.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -2000, 10000 );
@@ -43,6 +44,7 @@ Game.Controllers.webgl = (function() {
             renderer = new THREE.WebGLRenderer( { antialias: true } );
             renderer.setSize( window.innerWidth, window.innerHeight );
 
+            document.body.appendChild(renderer.domElement);
         },
 
 
@@ -50,9 +52,11 @@ Game.Controllers.webgl = (function() {
         function animate
         Game loop - requests each new frame
         */
-        animate: function() {
-
+        animate: function() {  
+            requestAnimationFrame( this.animate );   
+            this.render();   
         },
+
 
 
         /*
@@ -60,7 +64,12 @@ Game.Controllers.webgl = (function() {
         Handles game state updates
         */
         update: function() {
-
+            for(var i = 0;i<activeModels.length;i++){
+                activeModels[i].update();
+            }  
+            for(var i = 0;i<activeView.length;i++){
+                activeView[i].update();
+            }  
         },
 
 
@@ -68,6 +77,18 @@ Game.Controllers.webgl = (function() {
         function render
         */
         render: function() {
+            loops = 0;
+
+            // Attempt to update as many times as possible to get to our nextGameTick 'timeslot'
+            // However, we only can update up to 10 times per frame
+            while ( (new Date).getTime() > nextGameTick && loops < MAX_FRAME_SKIP ) {
+                this.update();
+                nextGameTick += SKIP_TICKS;
+                loops++;
+            }
+
+            // Render our scene
+            renderer.render( this.scene, this.camera );
 
         }
 

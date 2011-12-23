@@ -1,11 +1,8 @@
-Game.Controllers.webgl = (function() {
+App.Controllers.webgl = (function() {
 
-    var
-    renderer,
-    appView,
-
+    var currentStage;
     // Game loop
-    loops = 0,
+    var loops = 0,
     nextGameTick = (new Date).getTime(),
 
     // Constants
@@ -16,33 +13,33 @@ Game.Controllers.webgl = (function() {
     return {
 
         // App variables
-        camera: null,
-        scene: null,
+          renderer:null,        
         projector: null,
-
+        jqDiv:null,
         /*
         Initialize scene
         */
-        initialize: function() {
+        initialize: function(jqElement) {
+            this.jqDiv = jqElement;
             _.bindAll( this, "animate", "render", "update" );
-             debugger;
-            // Initialize camera
-            this.camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, -2000, 10000 );
-            this.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -2000, 10000 );
-            this.camera.position.y = 70.711;
-            this.camera.position.x = 100;
-            this.camera.position.z = 100;
-
-            // Create scene
-            this.scene = new THREE.Scene();
 
             // Create projector
             this.projector = new THREE.Projector();
 
             // Create renderer
-            renderer = new THREE.WebGLRenderer( { antialias: true } );
-            renderer.setSize( window.innerWidth, window.innerHeight );
-
+            this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+            this.renderer.setSize( this.jqDiv.width(), this.jqDiv.height() );
+             // initialize fps counter
+            stats = new Stats(); ;
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.top = '0px';
+            
+            this.jqDiv.append(this.renderer.domElement);
+            //render the current stage
+            currentStage = App.Stages.Galaxy;
+            currentStage.initialize(this);
+            
+            this.animate();
         },
 
 
@@ -50,9 +47,12 @@ Game.Controllers.webgl = (function() {
         function animate
         Game loop - requests each new frame
         */
-        animate: function() {
-
+        animate: function() {  
+            requestAnimationFrame( this.animate ); 
+            stats.update();      
+            this.render();   
         },
+
 
 
         /*
@@ -60,7 +60,7 @@ Game.Controllers.webgl = (function() {
         Handles game state updates
         */
         update: function() {
-
+            currentStage.update(this);
         },
 
 
@@ -68,6 +68,18 @@ Game.Controllers.webgl = (function() {
         function render
         */
         render: function() {
+            loops = 0;
+
+            // Attempt to update as many times as possible to get to our nextGameTick 'timeslot'
+            // However, we only can update up to 10 times per frame
+            while ( (new Date).getTime() > nextGameTick && loops < MAX_FRAME_SKIP ) {
+                this.update();
+                nextGameTick += SKIP_TICKS;
+                loops++;
+            }
+
+            // Render our scene
+            currentStage.render(this);
 
         }
 

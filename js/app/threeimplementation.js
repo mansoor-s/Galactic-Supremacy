@@ -18,8 +18,8 @@ function init() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
 
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-    camera.position.z = 9000;
+    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
+    camera.position.z = 1000;
 
     scene = new THREE.Scene();
 
@@ -31,16 +31,16 @@ function init() {
     material.yellow = new THREE.ParticleBasicMaterial( { map: new THREE.Texture( generateSprite('yellow') ), blending: THREE.AdditiveBlending } );
     */
     materials[1] = new THREE.ParticleBasicMaterial( {
-        size: 10,
-		color:0xffffff,
-        map:THREE.ImageUtils.loadTexture( './images/disc.png' ),  
-        //blending: THREE.AdditiveBlending
+        size: 20,
+        color:0xffffff,
+        map:THREE.ImageUtils.loadTexture( "disc.png" ),  
+        blending: THREE.AdditiveBlending,
         transparent: true
     } );
     materials[0] = new THREE.ParticleBasicMaterial( {
-        size: 10,
+        size: 20,
         color:0xffffff,
-        map:THREE.ImageUtils.loadTexture( './images/disc.png' ), 
+        map:THREE.ImageUtils.loadTexture( "disc.png" ), 
         blending: THREE.AdditiveBlending,
         transparent: true
     } );
@@ -49,16 +49,20 @@ function init() {
 
     for ( i = 0; i < starlist.length; i ++ ) {
 
-        vector = new THREE.Vector3( starlist[i].x,starlist[i].y, starlist[i].z + 1000
- );
+        vector = new THREE.Vector3( starlist[i].x,starlist[i].y,0 );
         geometry.vertices.push( new THREE.Vertex( vector ) );
 
     }
 
+    for ( var i = 0; i < 1; i++ ) {
+
         var particle = new THREE.ParticleSystem( geometry, materials[1] );
 
-        scene.add( particle );
 
+
+
+        scene.add( particle );
+    }
     //canvas renderer
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -96,6 +100,7 @@ function init() {
                         targetDistance = distance ;  
                     }
                 }
+
             } 
         }; 
         if(target!== null)particles[target].material = material.yellow;   
@@ -104,28 +109,30 @@ function init() {
     $(container).bind('click',function(){
         //centerson a star
         centerOn();
-    });
-	
-	$(container).bind('mousemove', function(event) {
-		//mouseX = event.clientX - windowHalfX;
-		//mouseY = event.clientY - windowHalfY;
-	});
+    })
 
-    stats = new Stats();
+    stats = new Stats(); ;
     stats.domElement.style.position = 'absolute';
-    stats.domElement.style.top = '75px';
-	stats.domElement.style.right = '0px';
+    stats.domElement.style.top = '0px';
     container.appendChild( stats.domElement );
 
-    //var renderModel = new THREE.RenderPass( scene, camera ,undefined,0x0000ff);    
-    //var effectBloom = new THREE.BloomPass( 50 );       
-
+    
 
     animate();  
+} 
+function zoomIn(){
+    mouseZ += mouseZ < 8 ? 1 : 0; 
+
+    new TWEEN.Tween( camera.position )
+    .to({
+        x:camera.position.x,
+        y:camera.position.y,
+        z:1000 - (mouseZ*100)
+    }, 100 )
+    .start()
+    materials[1].size = camera.position.z/1000*20; 
+    centerOn();
 }
-
-
-
 //function for centering on a star
 function centerOn(){
     for(istar in particles){ 
@@ -144,7 +151,7 @@ function centerOn(){
                     x:particles[istar2].position.x - particles[istar].position.x,
                     y:particles[istar2].position.y - particles[istar].position.y,
                     z:particles[istar2].position.z - particles[istar].position.z
-                }, 150 )
+                }, 100 )
                 .start()
             }
 
@@ -152,45 +159,17 @@ function centerOn(){
         }
     }
 }
-
-
-function zoomIn(){
-    if ( mouseZ > 19) {
-		return;
-	}
-	
-	mouseZ++;
-	
-	new TWEEN.Tween( camera.position )
-    .to({
-        x: camera.position.x,
-        y: camera.position.y,
-        z: 9000 - (mouseZ * 400)
-    }, 150 )
-    .start()
-    materials[1].size = (mouseZ / 100) * 20; 
-	
-	
-	
-    //centerOn();
-}
-
 function zoomOut(){
-	if (mouseZ === 0) {
-		return;
-	}
-	
-	mouseZ--;
-	
+    mouseZ -= mouseZ > 0 ? 1 : 0; 
+
     new TWEEN.Tween( camera.position )
     .to({
-        x: camera.position.x,
-        y: camera.position.y,
-        z:  9000 - (mouseZ * 400)
+        x:camera.position.x,
+        y:camera.position.y,
+        z:1000 - (mouseZ*100)
     }, 100 )
     .start()
-	
-    materials[1].size = (mouseZ / 100) * 20;      
+    materials[1].size = camera.position.z/1000*20;             
 }
 
 /*function generateSprite(type) {
@@ -289,11 +268,14 @@ function render() {
 
     TWEEN.update();
 
-    camera.position.x += ( mouseX - camera.position.x ) * 1;
-    camera.position.y += ( - mouseY - camera.position.y ) * 1;
-	
+    /* camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+    camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+
+    */
+
+
     camera.lookAt( cameraTarget );
-    //renderer.clear();   
+    renderer.clear();   
 
     renderer.render(scene,camera)
 

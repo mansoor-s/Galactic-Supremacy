@@ -5,7 +5,7 @@ App.Stages.Galaxy = (function() {
     var materials= [];
     var starlist;
     return {
-         initialize:function (webgl) {
+        initialize:function (webgl) {
             starlist = createStars();
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 75, webgl.jqDiv.width() / webgl.jqDiv.height(), 1, 5000 );
@@ -15,13 +15,15 @@ App.Stages.Galaxy = (function() {
             scene = new THREE.Scene();
 
             //declare materials
-            materials[0] = new THREE.ParticleBasicMaterial( {
-                size: 20,
-                color:0xffffff,
-                map:THREE.ImageUtils.loadTexture( "images/star0.png" ), 
+            materials[0] = new THREE.ParticleBasicMaterial( { 
+                size: 10, 
+                color:0x0000ff,
+                map: THREE.ImageUtils.loadTexture( "images/spark1.png" ),
                 blending: THREE.AdditiveBlending,
-                transparent: true
+                depthTest: false,
+                transparent : true 
             } );
+
             // create geometry for the particle system  and add vertices to it
             galaxyGeometry = new THREE.Geometry();
             for ( i = 0; i < starlist.length; i ++ ) {
@@ -30,8 +32,13 @@ App.Stages.Galaxy = (function() {
                 galaxyGeometry.vertices.push( new THREE.Vertex( vector ) );
 
             }
+
             //declare particle system with material 0
             var particle = new THREE.ParticleSystem( galaxyGeometry, materials[0] );
+            particle.dynamic = true;          
+
+
+
             //add it to the scene
             scene.add( particle );
 
@@ -42,6 +49,25 @@ App.Stages.Galaxy = (function() {
         render:function(webgl){
             //call render for the stage
             webgl.renderer.render(scene,camera);
+        },
+
+
+        //mousemove handler
+        onMouseMove:function(event){           
+
+
+        },
+        //declaring all events
+        events:{
+            'click': 'onMouseMove' 
+        },
+        //event distribution
+        _event:function(event){
+            for (var type in this.events){
+                if (event.type === type){
+                    this[this.events[type]](event); 
+                }
+            }
         }
     }
 })();

@@ -27,7 +27,7 @@ App.Controllers.webgl = (function() {
             this.projector = new THREE.Projector();
 
             // Create renderer
-            this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+            this.renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
             this.renderer.setSize( this.jqDiv.width(), this.jqDiv.height() );
              // initialize fps counter
             stats = new Stats(); ;
@@ -38,6 +38,8 @@ App.Controllers.webgl = (function() {
             //render the current stage
             currentStage = App.Stages.Galaxy;
             currentStage.initialize(this);
+                                          //event binding
+            this.jqDiv.on('mousedown mouseup mousemove mousewheel dblclick click',this._event);
             
             this.animate();
         },
@@ -81,7 +83,10 @@ App.Controllers.webgl = (function() {
             // Render our scene
             currentStage.render(this);
 
+        },
+        //pass the event handling to proper stage
+        _event:function(event){
+            currentStage._event(event);
         }
-
     };
 })();

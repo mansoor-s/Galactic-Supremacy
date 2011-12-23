@@ -10,10 +10,9 @@ App.Controllers.App = (function() {
         Initialize the game
         */
         initialize: function() {
-            _.bindAll( this, "animate", "render", "update" );
             //initializing everything
-            App.Controllers.webgl.initialize();
-            activeModules.push(Game.Controllers.webgl);
+            App.Controllers.webgl.initialize($('.gs-viewport'));
+            activeModules.push(App.Controllers.webgl);
 
             /* a sugestion
             Game.Controllers.ui.initialize();

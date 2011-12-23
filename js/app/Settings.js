@@ -1,9 +1,8 @@
 window.App = {
-Controlers:{},
-Models:{},
-Views:{}
+    Controllers:{},
+    Stages:{},
 }
 App.settings = {
-version: 0.000,
-theme:'darkish'
+    version: 0.000,
+    theme:'darkish'
 }

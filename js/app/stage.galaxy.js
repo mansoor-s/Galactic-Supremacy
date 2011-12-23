@@ -15,13 +15,15 @@ App.Stages.Galaxy = (function() {
             scene = new THREE.Scene();
 
             //declare materials
-            materials[0] = new THREE.ParticleBasicMaterial( {
-                size: 20,
-                color:0xffffff,
-                map:THREE.ImageUtils.loadTexture( "images/star0.png" ), 
+            materials[0] = new THREE.ParticleBasicMaterial( { 
+                size: 10, 
+                color:0x0000ff,
+                map: THREE.ImageUtils.loadTexture( "images/spark1.png" ),
                 blending: THREE.AdditiveBlending,
-                transparent: true
+                depthTest: false,
+                transparent : true 
             } );
+
             // create geometry for the particle system  and add vertices to it
             galaxyGeometry = new THREE.Geometry();
             for ( i = 0; i < starlist.length; i ++ ) {
@@ -30,8 +32,13 @@ App.Stages.Galaxy = (function() {
                 galaxyGeometry.vertices.push( new THREE.Vertex( vector ) );
 
             }
+
             //declare particle system with material 0
             var particle = new THREE.ParticleSystem( galaxyGeometry, materials[0] );
+            particle.dynamic = true;          
+
+
+
             //add it to the scene
             scene.add( particle );
 
@@ -48,7 +55,7 @@ App.Stages.Galaxy = (function() {
         //mousemove handler
         onMouseMove:function(event){           
 
-            
+
         },
         //declaring all events
         events:{

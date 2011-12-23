@@ -5,7 +5,7 @@ App.Stages.Galaxy = (function() {
     var materials= [];
     var starlist;
     return {
-         initialize:function (webgl) {
+        initialize:function (webgl) {
             starlist = createStars();
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 75, webgl.jqDiv.width() / webgl.jqDiv.height(), 1, 5000 );
@@ -42,6 +42,25 @@ App.Stages.Galaxy = (function() {
         render:function(webgl){
             //call render for the stage
             webgl.renderer.render(scene,camera);
+        },
+
+
+        //mousemove handler
+        onMouseMove:function(event){           
+
+            
+        },
+        //declaring all events
+        events:{
+            'click': 'onMouseMove' 
+        },
+        //event distribution
+        _event:function(event){
+            for (var type in this.events){
+                if (event.type === type){
+                    this[this.events[type]](event); 
+                }
+            }
         }
     }
 })();

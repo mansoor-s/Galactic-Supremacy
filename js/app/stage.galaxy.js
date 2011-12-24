@@ -4,19 +4,24 @@ App.Stages.Galaxy = (function() {
     var scene;
     var materials= [];
     var starlist;
+    var farestCameraPosition = 5000;
+    var nearestCameraPosition = 1000;
+    //the levels of zoom
+    var zoomLevel = 1;// 
     return {
         initialize:function (webgl) {
+            //get list of stars from the generator function(for now)
             starlist = createStars();
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 75, webgl.jqDiv.width() / webgl.jqDiv.height(), 1, 5000 );
-            camera.position= {x:0,y:0,z:5000 };  
+            camera.position= {x:0,y:0,z:farestCameraPosition };  
 
             // Create scene
             scene = new THREE.Scene();
 
             //declare materials
             materials[0] = new THREE.ParticleBasicMaterial( { 
-                size: 10, 
+                size: 20, 
                 color:0x0000ff,
                 map: THREE.ImageUtils.loadTexture( "images/spark1.png" ),
                 blending: THREE.AdditiveBlending,
@@ -53,19 +58,19 @@ App.Stages.Galaxy = (function() {
 
 
         //mousemove handler
-        onMouseMove:function(event){           
-
+        onMouseWheel:function(event,delta){           
+             
 
         },
-        //declaring all events
+        //declaring all event handlers
         events:{
-            'click': 'onMouseMove' 
+            'mousewheel': 'onMouseWheel' 
         },
         //event distribution
-        _event:function(event){
+        _event:function(event,delta){
             for (var type in this.events){
                 if (event.type === type){
-                    this[this.events[type]](event); 
+                    this[this.events[type]](event,delta); 
                 }
             }
         }

@@ -39,7 +39,7 @@ App.Controllers.webgl = (function() {
             currentStage = App.Stages.Galaxy;
             currentStage.initialize(this);
                                           //event binding
-            this.jqDiv.on('mousedown mouseup mousemove mousewheel dblclick click',this._event);
+            this.jqDiv.on('mousedown mouseup mousemove dblclick click mousewheel',this._event);
             
             this.animate();
         },
@@ -85,8 +85,8 @@ App.Controllers.webgl = (function() {
 
         },
         //pass the event handling to proper stage
-        _event:function(event){
-            currentStage._event(event);
+        _event:function(event,delta){
+            currentStage._event(event,delta);
         }
     };
 })();

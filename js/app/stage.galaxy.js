@@ -10,11 +10,17 @@ App.Stages.Galaxy = (function() {
     var zoomLevelCurrent = 0;//
     var zoomLevelCount =10; 
     var controller;
+    var particleSystem;
     return {
         initialize:function (webgl) {
             controller = webgl;
             //get list of stars from the generator function(for now)
-            starlist = createStars();
+            //starlist = createStars();
+            starlist = [];
+            starlist[0] = {x:1000,y:0};
+            starlist[1] = {x:-1000,y:0}; 
+            starlist[2] = {x:5000,y:0};
+            starlist[3] = {x:-5000,y:0}; 
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 75, controller.jqDiv.width() / controller.jqDiv.height(), 1, 5000 );
             camera.position= {x:0,y:0,z:farestCameraPosition };  
@@ -24,7 +30,7 @@ App.Stages.Galaxy = (function() {
 
             //declare materials
             materials[0] = new THREE.ParticleBasicMaterial( { 
-                size: 20, 
+                size: 150, 
                 color:0x0000ff,
                 map: THREE.ImageUtils.loadTexture( "images/spark1.png" ),
                 blending: THREE.AdditiveBlending,
@@ -42,23 +48,24 @@ App.Stages.Galaxy = (function() {
             }
 
             //declare particle system with material 0
-            var particle = new THREE.ParticleSystem( galaxyGeometry, materials[0] );
-            particle.dynamic = true;          
+            particleSystem = new THREE.ParticleSystem( galaxyGeometry, materials[0] );
+            particleSystem.dynamic = true;          
 
 
 
             //add it to the scene
-            scene.add( particle );
+            scene.add( particleSystem );
 
         },
         update:function(){
-            TWEEN.update();
+
         },
         render:function(){
             //call render for the stage
+            TWEEN.update();        
             controller.renderer.render(scene,camera);
         },
-        zoomIn:function(){
+        zoomIn:function(xy){
             //animate camera to new position 
             zoomLevelCurrent += zoomLevelCurrent < zoomLevelCount ? 1 : 0; 
             //animate camera to new position 
@@ -67,10 +74,11 @@ App.Stages.Galaxy = (function() {
                 x:camera.position.x,
                 y:camera.position.y,
                 z:farestCameraPosition - (zoomLevelCurrent*((farestCameraPosition-nearestCameraPosition)/zoomLevelCount))
-            }, 100 )
+            }, 500 )
             .start();
+            this.centerOn(xy) 
         },
-        zoomOut:function(){
+        zoomOut:function(xy){
             //change the current zoom level
             zoomLevelCurrent -= zoomLevelCurrent > 0 ? 1 : 0; 
             //animate camera to new position
@@ -79,24 +87,23 @@ App.Stages.Galaxy = (function() {
                 x:camera.position.x,
                 y:camera.position.y,
                 z:farestCameraPosition - (zoomLevelCurrent*((farestCameraPosition-nearestCameraPosition)/zoomLevelCount))
-            }, 100 )
+            }, 500 )
             .start();
+            this.centerOn(xy)
         },
         //moves the stars so that position is at the center of the screen
         centerOn:function(mousePosition){
-            position = controller.getWorldXYZ(camera,mousePosition,0);
-            position.x-=controller.jqDiv.width();
-            position.y-=controller.jqDiv.height();
-              debugger;
-                new TWEEN.Tween( galaxyGeometry.position )
-                .to({
-                    x:galaxyGeometry.position.x - position.x,
-                    y:galaxyGeometry.position.y - position.y,
-                    z:galaxyGeometry.position.z - position.z
-                }, 100 )
-                .start()
-          
-            
+         
+            var position = controller.getWorldXYZ(camera,mousePosition,0);
+          new TWEEN.Tween( camera.position )
+            .to({
+                x:position.x,
+                y:position.y,
+                z:camera.position.z
+            }, 500 )
+            .start()
+
+
         },
         //mousewheel handler
         onMouseWheel:function(event,delta){           
@@ -109,9 +116,13 @@ App.Stages.Galaxy = (function() {
         },
         //mouseclick handler
         onMouseClick:function(event){
-              centerOn({x:event.offsetX,y:event.offsetY});
+
+            var clickX= event.pageX - $(event.target).position().left;
+            var clickY= event.pageY - $(event.target).position().top;
+
+            this.centerOn({x:clickX,y:clickY});
         },
-        //declaring all event handlers
+        //declaring all event handlers                         
         events:{
             'mousewheel': 'onMouseWheel',
             'click': 'onMouseClick'

@@ -86,13 +86,20 @@ App.Controllers.webgl = (function() {
         },
         //gets position in the z plane of a givvent mouse coordinates
         getWorldXYZ:function(camera,xyPosition,z){
-            var origin = camera.position;
-            var vector =  this.projector.unprojectVector(new THREE.Vector3(xyPosition.x,xyPosition.y,1), camera);
 
-            var scalar =(z - origin.z) / vector.z;
+            var mousex = ( xyPosition.x / this.jqDiv.width() ) * 2 - 1;
+            var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 - 1;
+
+            var origin = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
+
+            var vector = new THREE.Vector3( -mousex, mousey, -1 );
+            this.projector.unprojectVector( vector, camera );
+            vector =  vector.subSelf( origin ).normalize();
+            var scalar =(origin.z  - z)/vector.z;   
+
             var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
-
-            debugger;
+            intersection.z = z;
+            console.debug(intersection);
             return intersection;
         },
         //pass the event handling to proper stage

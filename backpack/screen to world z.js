@@ -5,11 +5,15 @@
 [17:29] <chandlerp> and z_plane_point is where you want to intersect the Z plane at
 [17:33] <IvanKuzev> thank you
 */
-var origin = new THREE.Vector3(8, 7, 5);
-var vector = new THREE.Vector3(-1, -1, -1);
-var z_plane_point = 0;
 
-var scalar =(z_plane_point - origin.z) / vector.z
-var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
+function getWorldXYZ(camera,xyPosition,z){
+    var origin = camera.position;
+    var vector =  projector.unprojectVector(new THREE.Vector3(xyPosition.x,xyPosition.y,1), camera);
+    var z_plane_point = z;
 
-console.debug(intersection);
+    var scalar =(z_plane_point - origin.z) / vector.z
+    var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
+
+    debugger;
+    return intersection;
+}

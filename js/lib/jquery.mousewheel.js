@@ -1,78 +1,12 @@
-/*! Copyright (c) 2010 Brandon Aaron (http://brandonaaron.net)
+/*! Copyright (c) 2011 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
  *
  * Thanks to: http://adomas.org/javascript-mouse-wheel/ for some pointers.
  * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
  * Thanks to: Seamus Leahy for adding deltaX and deltaY
  *
- * Version: 3.0.4
+ * Version: 3.0.6
  * 
  * Requires: 1.2.2+
  */
-
-(function($) {
-
-var types = ['DOMMouseScroll', 'mousewheel'];
-
-$.event.special.mousewheel = {
-    setup: function() {
-        if ( this.addEventListener ) {
-            for ( var i=types.length; i; ) {
-                this.addEventListener( types[--i], handler, false );
-            }
-        } else {
-            this.onmousewheel = handler;
-        }
-    },
-    
-    teardown: function() {
-        if ( this.removeEventListener ) {
-            for ( var i=types.length; i; ) {
-                this.removeEventListener( types[--i], handler, false );
-            }
-        } else {
-            this.onmousewheel = null;
-        }
-    }
-};
-
-$.fn.extend({
-    mousewheel: function(fn) {
-        return fn ? this.bind("mousewheel", fn) : this.trigger("mousewheel");
-    },
-    
-    unmousewheel: function(fn) {
-        return this.unbind("mousewheel", fn);
-    }
-});
-
-
-function handler(event) {
-    var orgEvent = event || window.event, args = [].slice.call( arguments, 1 ), delta = 0, returnValue = true, deltaX = 0, deltaY = 0;
-    event = $.event.fix(orgEvent);
-    event.type = "mousewheel";
-    
-    // Old school scrollwheel delta
-    if ( event.wheelDelta ) { delta = event.wheelDelta/120; }
-    if ( event.detail     ) { delta = -event.detail/3; }
-    
-    // New school multidimensional scroll (touchpads) deltas
-    deltaY = delta;
-    
-    // Gecko
-    if ( orgEvent.axis !== undefined && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
-        deltaY = 0;
-        deltaX = -1*delta;
-    }
-    
-    // Webkit
-    if ( orgEvent.wheelDeltaY !== undefined ) { deltaY = orgEvent.wheelDeltaY/120; }
-    if ( orgEvent.wheelDeltaX !== undefined ) { deltaX = -1*orgEvent.wheelDeltaX/120; }
-    
-    // Add event and delta to the front of the arguments
-    args.unshift(event, delta, deltaX, deltaY);
-    
-    return $.event.handle.apply(this, args);
-}
-
-})(jQuery);
+(function(a){function d(b){var c=b||window.event,d=[].slice.call(arguments,1),e=0,f=!0,g=0,h=0;return b=a.event.fix(c),b.type="mousewheel",c.wheelDelta&&(e=c.wheelDelta/120),c.detail&&(e=-c.detail/3),h=e,c.axis!==undefined&&c.axis===c.HORIZONTAL_AXIS&&(h=0,g=-1*e),c.wheelDeltaY!==undefined&&(h=c.wheelDeltaY/120),c.wheelDeltaX!==undefined&&(g=-1*c.wheelDeltaX/120),d.unshift(b,e,g,h),(a.event.dispatch||a.event.handle).apply(this,d)}var b=["DOMMouseScroll","mousewheel"];if(a.event.fixHooks)for(var c=b.length;c;)a.event.fixHooks[b[--c]]=a.event.mouseHooks;a.event.special.mousewheel={setup:function(){if(this.addEventListener)for(var a=b.length;a;)this.addEventListener(b[--a],d,!1);else this.onmousewheel=d},teardown:function(){if(this.removeEventListener)for(var a=b.length;a;)this.removeEventListener(b[--a],d,!1);else this.onmousewheel=null}},a.fn.extend({mousewheel:function(a){return a?this.bind("mousewheel",a):this.trigger("mousewheel")},unmousewheel:function(a){return this.unbind("mousewheel",a)}})})(jQuery)

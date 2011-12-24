@@ -7,7 +7,8 @@ App.Stages.Galaxy = (function() {
     var farestCameraPosition = 5000;
     var nearestCameraPosition = 1000;
     //the levels of zoom
-    var zoomLevel = 1;// 
+    var zoomLevelCurrent = 0;//
+    var zoomLevelCount =10; 
     return {
         initialize:function (webgl) {
             //get list of stars from the generator function(for now)
@@ -49,17 +50,43 @@ App.Stages.Galaxy = (function() {
 
         },
         update:function(webgl){
-
+            TWEEN.update();
         },
         render:function(webgl){
             //call render for the stage
             webgl.renderer.render(scene,camera);
         },
-
-
-        //mousemove handler
+        zoomIn:function(){
+            //animate camera to new position 
+            zoomLevelCurrent += zoomLevelCurrent < zoomLevelCount ? 1 : 0; 
+            //animate camera to new position 
+            new TWEEN.Tween( camera.position )
+            .to({
+                x:camera.position.x,
+                y:camera.position.y,
+                z:farestCameraPosition - (zoomLevelCurrent*((farestCameraPosition-nearestCameraPosition)/zoomLevelCount))
+            }, 100 )
+            .start();
+        },
+        zoomOut:function(){
+            //change the current zoom level
+            zoomLevelCurrent += zoomLevelCurrent < zoomLevelCount ? 1 : 0; 
+            //animate camera to new position
+            new TWEEN.Tween( camera.position )
+            .to({
+                x:camera.position.x,
+                y:camera.position.y,
+                z:farestCameraPosition - (zoomLevelCurrent*((farestCameraPosition-nearestCameraPosition)/zoomLevelCount))
+            }, 100 )
+            .start();
+        },
+        //mousewheel handler
         onMouseWheel:function(event,delta){           
-             
+            if(delta>0){
+                this.zoomIn();
+            }else{
+                this.zoomOut();            
+            }
 
         },
         //declaring all event handlers

@@ -99,7 +99,6 @@ App.Controllers.webgl = (function() {
 
             var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
             intersection.z = z;
-            console.debug(intersection);
             return intersection;
         },
         //pass the event handling to proper stage

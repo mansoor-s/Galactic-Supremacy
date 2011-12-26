@@ -1,12 +1,12 @@
 function createStars() {
     var spiralTransformations = {
-        x: .625,
+        x: .6,//675,
         y: .6
     }
-	var zRandomOffsetRange = 110;
-    var starsPerArm = 50000;
-    var randomOffsetRange = 1300;
-    var A = 3000;
+	var zRandomOffsetRange = 120;
+    var starsPerArm = 100000;
+    var randomOffsetRange = 2000;
+    var A = 4000;
     xTransform = spiralTransformations.x || .6;  // "scale. higher = more zoomed in"
     yTransform = spiralTransformations.y || .6;
     
@@ -61,7 +61,6 @@ function createStars() {
                 var y = yTemp;
                 
                var left, top;
-               // y direction is reverse of a cart. graph
                 if (spiralOdd) {
                     left = x + middleBiasedRand(randomOffsetRange);
                     top = -y + middleBiasedRand(randomOffsetRange);
@@ -160,9 +159,9 @@ function middleBiasedRand(maxOffset) {
     var sudoRand = Math.round(Math.random());
     var rand;
     if (sudoRand === 1) {
-        rand =  -1 * Math.pow(Math.random(), 1.55) * maxOffset;
+        rand =  -1 * Math.pow(Math.random(), 1.75) * maxOffset;
     } else {
-        rand = Math.pow(Math.random(), 1.55) * maxOffset;
+        rand = Math.pow(Math.random(), 1.75) * maxOffset;
     }
     
     return rand;

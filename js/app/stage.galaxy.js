@@ -4,14 +4,14 @@ App.Stages.Galaxy = (function() {
     var scene;
     var materials= [];
     var starlist;
-    var farestCameraPosition = 10000;
+    var farestCameraPosition = 12000;
     var nearestCameraPosition = 230;
     //the levels of zoom
     var zoomLevelCurrent = 0;//
-    var zoomLevelCount = 57; 
+    var zoomLevelCount = 50; 
     var controller;
     var particleSystem;
-    var starSize = 10;
+    var starSize = 3;
     
     //used for calculating star size with respect to camera z location
     var currentStarSize = 10;
@@ -37,7 +37,7 @@ App.Stages.Galaxy = (function() {
             //get list of stars from the generator function(for now)
             starlist = createStars();
             // Initialize camera
-            camera = new THREE.PerspectiveCamera( 90, controller.jqDiv.width() / controller.jqDiv.height(), 1, 11000 );
+            camera = new THREE.PerspectiveCamera( 90, controller.jqDiv.width() / controller.jqDiv.height(), 1, 15000 );
             camera.position= {x: 0, y: 0, z: farestCameraPosition };  
 
             // Create scene
@@ -90,9 +90,9 @@ App.Stages.Galaxy = (function() {
             //call render for the stage
             
             if (ctrPressed) {
-                camera.position.x += currentMouse.x - camera.position.x; //( mouseX - camera.position.x ) * 0.01;
-                camera.position.y += currentMouse.y - camera.position.y ;//( -mouseY - camera.position.y ) * 0.01;
-                //camera.lookAt( pointOfIntrest ); 
+                camera.position.x += ( mouseX - camera.position.x ) * 0.01;
+                camera.position.y += ( -mouseY - camera.position.y ) * 0.01;
+                camera.lookAt( pointOfIntrest ); 
             }
             
             
@@ -125,7 +125,7 @@ App.Stages.Galaxy = (function() {
             //animate camera to new position 
             new TWEEN.Tween( camera.position )
             .to({
-                z: farestCameraPosition - (zoomLevelCurrent * 175)
+                z: (1 / zoomLevelCurrent) * 6000  - 100
             }, 500 )
             .start()
             
@@ -133,15 +133,18 @@ App.Stages.Galaxy = (function() {
         },
         
         zoomOut: function(xy){
+            var levelOne = false
             //change the current zoom level
             if (zoomLevelCurrent === 0) {
                 return;
+            } else if (zoomLevelCurrent === 1) {
+                levelOne = true
             }
             zoomLevelCurrent--;
             
             new TWEEN.Tween(  camera.position  )
             .to({     
-                z: farestCameraPosition - (zoomLevelCurrent * 175)
+                z: !levelOne ? (1 / zoomLevelCurrent) * 6000 - 100: farestCameraPosition
             }, 500 )
             .start()
             

@@ -1,7 +1,7 @@
 .gs-zoomSliderContainer {
     position: absolute;
     display: block;
-    width: 80px;
+    width: 60px;
     height: 500px;
     border: 1px solid #293a45;
     top: 150px;
@@ -12,7 +12,7 @@
 .gs-zoomSlider {
     border: 1px solid #293a45;
     position: relative;
-    width: 100px;
+    width: 80px;
     height: 80px;
     left: -10px;
     background: rgba(0, 0, 0, .9);
@@ -27,17 +27,17 @@
 
 .gs-zoomSliderTopIcon {
     float: left;
-    width: 80px;
-    height: 80px;
-    background: url(../../images/sliderbackground.png) no-repeat;
+    width: 60px;
+    height: 60px;
+    background: url(../../images/sliderbackground.png) 0 100% no-repeat;
 }
 
 .gs-zoomSliderBottomIcon {
     float: right;
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     position: relative;
     bottom: 0;
     top: 330px;
-    background: url(../../images/sliderbackground.png) 0 100% no-repeat;
+    background: url(../../images/sliderbackground.png) no-repeat;
 }

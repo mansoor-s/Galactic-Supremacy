@@ -5,10 +5,10 @@ App.Stages.Galaxy = (function() {
     var materials= [];
     var starlist;
     var farestCameraPosition = 12000;
-    var nearestCameraPosition = 230;
+    var nearestCameraPosition = 200;
     //the levels of zoom
     var zoomLevelCurrent = 0;//
-    var zoomLevelCount = 50; 
+    var zoomLevelCount = 35; 
     var controller;
     var particleSystem;
     var starSize = 3;
@@ -90,9 +90,9 @@ App.Stages.Galaxy = (function() {
             //call render for the stage
             
             if (ctrPressed) {
-                camera.position.x += ( mouseX - camera.position.x ) * 0.01;
-                camera.position.y += ( -mouseY - camera.position.y ) * 0.01;
-                camera.lookAt( pointOfIntrest ); 
+                //camera.position.x += ( mouseX - camera.position.x ) * 0.01;
+                //camera.position.y += ( -mouseY - camera.position.y ) * 0.01;
+                camera.lookAt( {x: ( mouseX - camera.position.x ) * 0.01, y: ( -mouseY - camera.position.y ) * 0.01, z: 0} ); 
             }
             
             

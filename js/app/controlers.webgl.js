@@ -36,12 +36,12 @@ App.Controllers.webgl = (function() {
             stats.domElement.style.right = '0px';
             this.jqDiv.append(stats.domElement);
             this.jqDiv.append(this.renderer.domElement);
-            
+
             //render the current stage
             currentStage = App.Stages.Galaxy;
             currentStage.initialize(this);
             //event binding
-            
+
             this.jqDiv.on('mousedown mouseup mousemove dblclick click mousewheel', this._event);
             $(document).live('keydown keyup keypress', this._event);
 
@@ -104,6 +104,35 @@ App.Controllers.webgl = (function() {
             var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
             intersection.z = z;
             return intersection;
+        },
+        //rotates a vectorbyX
+        rotateVectorX: function (vector,angle){
+            var length = Math.sqrt(vector.y*vector.y + vector.z*vector.z);
+            var adjanced = cos(angle)*length;
+            var oposite = sin(angle)*length;
+
+            if(vector.z<0)adjanced *=-1;
+            if(vector.y<0)oposite *=-1;
+
+            return {
+                x: vector.x,
+                y: oposite,
+                z: adjanced
+            };
+
+
+        },
+        //rotates a vectorbyY
+        rotateVectorY: function (vector,degrees) {
+            var length = Math.sqrt(vector.x*vector.x + vector.z*vector.z);
+            var adjanced = cos(angle)*length;
+            var oposite = sin(angle)*length;
+
+            return {
+                x: adjanced,
+                y: vector.y,
+                z: oposite
+            };
         },
         //pass the event handling to proper stage
         _event:function(event,delta){

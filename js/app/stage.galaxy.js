@@ -41,6 +41,7 @@ App.Stages.Galaxy = (function() {
             controller = webgl;
             //get list of stars from the generator function(for now)
             starlist = createStars();
+            
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 90, controller.jqDiv.width() / controller.jqDiv.height(), 1, 30000 );
             camera.position= {
@@ -126,16 +127,16 @@ App.Stages.Galaxy = (function() {
                 console.debug(cameraRig);
             //left
             }else if (e.keyCode === 37) {
-                cameraRig.rotation.y+=controller.degreesToRadians(1);
+                cameraRig.rotation.y -= controller.degreesToRadians(1);
             //right
             }else if (e.keyCode === 39) {
-                cameraRig.rotation.y-=controller.degreesToRadians(1);
+                cameraRig.rotation.y += controller.degreesToRadians(1);
             //up
             }else if (e.keyCode === 38) {
-                cameraRig.rotation.x+=controller.degreesToRadians(1);
+                cameraRig.rotation.x -= controller.degreesToRadians(1);
             //down
             }else if (e.keyCode === 40) {
-                cameraRig.rotation.x-=controller.degreesToRadians(1);
+                cameraRig.rotation.x += controller.degreesToRadians(1);
             //add
             }else if (e.keyCode === 107) {
                 //this zooming doesnt work..for now
@@ -173,7 +174,34 @@ App.Stages.Galaxy = (function() {
 
             this.centerOn(xy) 
         },
+        getClosestStar:function(xy){
+            xy.x = ( xy.x / controller.jqDiv.width() ) * 2 - 1;
+            xy.y =  -( xy.y / controller.jqDiv.height()) * 2 + 1;
+          
+            var target = null;
+            var targetDistance;
+            for (var i = 0; i < starlist.length; i ++ ) {
+                if(starlist[i].focused){
+                    starlist[i].focused =  false;
+                } 
+                var vector = new THREE.Vector3( starlist[i].x, starlist[i].y, starlist[i].z );
+                var pos2d =  controller.toScreenXY(vector,camera);
 
+                if ((Math.abs(pos2d.x - xy.x) < 20) && (Math.abs(pos2d.y - xy.y) < 20)){
+                    var distanceX = Math.abs(pos2d.x - xy.x);
+                    var distanceY = Math.abs(pos2d.y - xy.y);
+                    var distance =  Math.sqrt(distanceX*distanceX+distanceY*distanceY);
+                    if(target === null){
+                        target = starlist[i];  
+                        targetDistance = distance ;
+                    }else if(targetDistance > distance){
+                        target = starlist[i];  
+                        targetDistance = distance ;  
+                    }
+                }
+            }
+            return target;
+        },
         zoomOut: function(xy){
             var levelOne = false
             //change the current zoom level
@@ -204,25 +232,20 @@ App.Stages.Galaxy = (function() {
                     z: 0
                 };
             } else {
-                var z = 0;
-                position = controller.getWorldXYZ(camera,mousePosition,z);
-            }           
-            new TWEEN.Tween( cameraRig.position )
-            .to({
-                x: position.x,
-                y: position.y
-            }, 500 )
-            .onUpdate(function(){
-
-                cameraRig.matrixWorldNeedsUpdate = true;
-                camera.matrixWorldNeedsUpdate = true;
-                scene.matrixWorldNeedsUpdate = true;
-                scene.updateMatrixWorld(); 
-
+                //   var z = 0;
+                //    position = controller.getWorldXYZ(camera,mousePosition,z);
+                position = this.getClosestStar(mousePosition);
                 
-            })
-            .start()
-
+            }         
+            debugger;
+            if(position !== null){
+                new TWEEN.Tween( cameraRig.position )
+                .to({
+                    x: position.x,
+                    y: position.y
+                }, 500 )
+                .start()
+            }
 
         },
 
@@ -251,12 +274,10 @@ App.Stages.Galaxy = (function() {
         //mouseclick handler
         onMouseClick: function(event){
 
-            var clickX= event.pageX - $(event.target).position().left;
-            var clickY= event.pageY - $(event.target).position().top;
-
+          
             this.centerOn({
-                x: clickX, 
-                y: clickY
+                x: event.offsetX, 
+                y: event.offsetY
             });
         },
 

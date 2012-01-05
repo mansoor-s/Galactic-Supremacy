@@ -94,22 +94,18 @@ App.Controllers.webgl = (function() {
         getWorldXYZ:function(camera,xyPosition,z){
 
             var mousex = ( xyPosition.x / this.jqDiv.width() ) * 2 - 1;
-            var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 - 1;
-            //taking parent object into account it doesnt work for scale(wornder why?)
-            //       var origin = new THREE.Vector3((camera.position.x+camera.parent.position.x),
-            //       (camera.position.y+camera.parent.position.y),
-            //       (camera.position.z+camera.parent.position.z));
-            var vector = new THREE.Vector3( -mousex, mousey, 1 );
+            var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 + 1;
+          
+            var vector = new THREE.Vector3( -mousex, mousey, -1 );
 
             this.projector.unprojectVector( vector, camera );
-            vector.multiplyScalar(-1);
-         vector=   camera.matrixRotationWorld.multiplyVector3(vector);
-            vector.multiplyScalar(-1);
-            
+                        
             var origin = camera.matrixWorld.getPosition();
+            
 
             vector =  vector.subSelf( origin ).normalize();
-            var scalar =(origin.z -z  )/vector.z;   
+            
+            var scalar =(origin.z - z  )/vector.z;   
 
             var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
  
@@ -122,6 +118,15 @@ App.Controllers.webgl = (function() {
         },
         radiansToDegrees:function(radians){
             return (eval(radians))*(180/Math.PI);
+        },
+        toScreenXY:function( position, camera) {
+
+            var pos = position.clone();
+            projScreenMat = new THREE.Matrix4();
+            projScreenMat.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+            projScreenMat.multiplyVector3( pos );
+            return pos;
+
         },
         //pass the event handling to proper stage
         _event:function(event,delta){

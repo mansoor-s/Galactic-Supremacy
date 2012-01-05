@@ -3,7 +3,7 @@ function createStars() {
         x: .6,//675,
         y: .6
     }
-	var zRandomOffsetRange = 120;
+    var zRandomOffsetRange = 120;
     var starsPerArm = 100000;
     var randomOffsetRange = 2000;
     var A = 4000;
@@ -11,31 +11,31 @@ function createStars() {
     yTransform = spiralTransformations.y || .6;
     
     var spirals = [
-        {
-            xDirection: -1,
-            yDirection: 1,
-            xAngle: 30,
-            yAngle: 30
-        },
-        {
-            xDirection: 1,
-            yDirection: -1,
-            xAngle: -30,
-            yAngle: -30
-        },
+    {
+        xDirection: -1,
+        yDirection: 1,
+        xAngle: 30,
+        yAngle: 30
+    },
+    {
+        xDirection: 1,
+        yDirection: -1,
+        xAngle: -30,
+        yAngle: -30
+    },
         
-        {
-            xDirection: -1,
-            yDirection: 1,
-            xAngle: 0,
-            yAngle: 0
-        },
-        {
-            xDirection: 1,
-            yDirection: -1,
-            xAngle: 0,
-            yAngle: 0
-        }
+    {
+        xDirection: -1,
+        yDirection: 1,
+        xAngle: 0,
+        yAngle: 0
+    },
+    {
+        xDirection: 1,
+        yDirection: -1,
+        xAngle: 0,
+        yAngle: 0
+    }
 	
     ];
     
@@ -54,34 +54,34 @@ function createStars() {
         var odd = true;
         for (var j = 0; j < starsPerArm; j++) {
             a += .01;
-                var t = f_inv(a, s);
-                var x = calc_x(a, t, xTransform);
-                var y = calc_y(a, t, yTransform);
+            var t = f_inv(a, s);
+            var x = calc_x(a, t, xTransform);
+            var y = calc_y(a, t, yTransform);
                 
-                var yTemp = rotateY(x, y, yAngle);
-                var x = rotateX(x, y, xAngle);
-                var y = yTemp;
+            var yTemp = rotateY(x, y, yAngle);
+            x = rotateX(x, y, xAngle);
+            y = yTemp;
                 
-               var left, top;
-                if (spiralOdd) {
-                    left = x + middleBiasedRand(randomOffsetRange);
-                    top = -y + middleBiasedRand(randomOffsetRange);
-                    spiralOdd = false
-                } else {
-                    left = -x + middleBiasedRand(randomOffsetRange);
-                    top = y + middleBiasedRand(randomOffsetRange);
+            var left, top;
+            if (spiralOdd) {
+                left = x + middleBiasedRand(randomOffsetRange);
+                top = -y + middleBiasedRand(randomOffsetRange);
+                spiralOdd = false
+            } else {
+                left = -x + middleBiasedRand(randomOffsetRange);
+                top = y + middleBiasedRand(randomOffsetRange);
 					
-                    spiralOdd = true;
-                }
+                spiralOdd = true;
+            }
 				
-				var depth = middleBiasedRand(zRandomOffsetRange);
+            var depth = middleBiasedRand(zRandomOffsetRange);
 				
-                stars.push({
-                    x: left,
-                    y: top,
-                    z: depth,
-                    type: starType()
-                });
+            stars.push({
+                x: left,
+                y: top,
+                z: depth,
+                type: starType()
+            });
                 
             s += 1;
         }
@@ -115,7 +115,10 @@ function calc_y(a, t, z) {
 function find_center() {
     var top = $elem.height() / 2 ;
     var left = $elem.width() / 2;
-    var center = {top: 0, left: 0};
+    var center = {
+        top: 0, 
+        left: 0
+    };
 
     return center;
 }
@@ -186,7 +189,7 @@ function createDust() {
         x: .6,//675,
         y: .6
     }
-	var zRandomOffsetRange = 80;
+    var zRandomOffsetRange = 80;
     var starsPerArm = 1000;
     var randomOffsetRange = 500;
     var A = 4000;
@@ -194,31 +197,31 @@ function createDust() {
     yTransform = spiralTransformations.y || .6;
     
     var spirals = [
-        {
-            xDirection: -1,
-            yDirection: 1,
-            xAngle: 30,
-            yAngle: 30
-        },
-        {
-            xDirection: 1,
-            yDirection: -1,
-            xAngle: -30,
-            yAngle: -30
-        },
+    {
+        xDirection: -1,
+        yDirection: 1,
+        xAngle: 30,
+        yAngle: 30
+    },
+    {
+        xDirection: 1,
+        yDirection: -1,
+        xAngle: -30,
+        yAngle: -30
+    },
         
-        {
-            xDirection: -1,
-            yDirection: 1,
-            xAngle: 0,
-            yAngle: 0
-        },
-        {
-            xDirection: 1,
-            yDirection: -1,
-            xAngle: 0,
-            yAngle: 0
-        }
+    {
+        xDirection: -1,
+        yDirection: 1,
+        xAngle: 0,
+        yAngle: 0
+    },
+    {
+        xDirection: 1,
+        yDirection: -1,
+        xAngle: 0,
+        yAngle: 0
+    }
 	
     ];
     
@@ -235,34 +238,34 @@ function createDust() {
         var s = 0;
         var odd = true;
         for (var j = 0; j < starsPerArm; j++) {
-                var t = f_inv(a, s);
-                var x = calc_x(a, t, xTransform);
-                var y = calc_y(a, t, yTransform);
+            var t = f_inv(a, s);
+            var x = calc_x(a, t, xTransform);
+            var y = calc_y(a, t, yTransform);
                 
-                var yTemp = rotateY(x, y, yAngle);
-                var x = rotateX(x, y, xAngle);
-                var y = yTemp;
+            var yTemp = rotateY(x, y, yAngle);
+            x = rotateX(x, y, xAngle);
+            y = yTemp;
                 
-               var left, top;
-                if (spiralOdd) {
-                    left = x + middleBiasedRand(randomOffsetRange);
-                    top = -y + middleBiasedRand(randomOffsetRange);
-                    spiralOdd = false
-                } else {
-                    left = -x + middleBiasedRand(randomOffsetRange);
-                    top = y + middleBiasedRand(randomOffsetRange);
+            var left, top;
+            if (spiralOdd) {
+                left = x + middleBiasedRand(randomOffsetRange);
+                top = -y + middleBiasedRand(randomOffsetRange);
+                spiralOdd = false
+            } else {
+                left = -x + middleBiasedRand(randomOffsetRange);
+                top = y + middleBiasedRand(randomOffsetRange);
 					
-                    spiralOdd = true;
-                }
+                spiralOdd = true;
+            }
 				
-				var depth = middleBiasedRand(zRandomOffsetRange);
+            var depth = middleBiasedRand(zRandomOffsetRange);
 				
-                dusts.push({
-                    x: left,
-                    y: top,
-                    z: depth,
-                    type: starType()
-                });
+            dusts.push({
+                x: left,
+                y: top,
+                z: depth,
+                type: starType()
+            });
                 
             s += 10;
         }

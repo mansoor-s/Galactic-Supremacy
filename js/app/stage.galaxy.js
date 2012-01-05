@@ -26,7 +26,10 @@ App.Stages.Galaxy = (function() {
         initY: 0
     };
 
-    var currentMouse = {x: 0, y: 0};
+    var currentMouse = {
+        x: 0, 
+        y: 0
+    };
 
     //this is where the camea will look at when free camera is enable
     //ivankuzev:i am making it object3d so i can use all of its functions
@@ -40,11 +43,17 @@ App.Stages.Galaxy = (function() {
             starlist = createStars();
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 90, controller.jqDiv.width() / controller.jqDiv.height(), 1, 30000 );
-            camera.position= {x: 0, y: 0, z: farestCameraPosition };  
+            camera.position= {
+                x: 0, 
+                y: 0, 
+                z: farestCameraPosition
+            };  
+            camera.matrixAutoUpdate = true;
 
             cameraRig = new THREE.Object3D();
             cameraRig.eulerOrder = "ZYX";
             cameraRig.add(camera);
+            cameraRig.matrixAutoUpdate = true;
             // Create scene
             scene = new THREE.Scene();
 
@@ -98,7 +107,11 @@ App.Stages.Galaxy = (function() {
             if (ctrPressed) {
                 //camera.position.x += ( mouseX - camera.position.x ) * 0.01;
                 //camera.position.y += ( -mouseY - camera.position.y ) * 0.01;
-                camera.lookAt( {x: ( mouseX - camera.position.x ) * 0.01, y: ( -mouseY - camera.position.y ) * 0.01, z: 0} ); 
+                camera.lookAt( {
+                    x: ( mouseX - camera.position.x ) * 0.01, 
+                    y: ( -mouseY - camera.position.y ) * 0.01, 
+                    z: 0
+                } ); 
             }
 
             controller.renderer.render(scene,camera);
@@ -111,26 +124,26 @@ App.Stages.Galaxy = (function() {
                 ctrMouse.initY = currentMouse.y;
                 ctrPressed = true;
                 console.debug(cameraRig);
-                //left
+            //left
             }else if (e.keyCode === 37) {
                 cameraRig.rotation.y+=controller.degreesToRadians(1);
-                //right
+            //right
             }else if (e.keyCode === 39) {
                 cameraRig.rotation.y-=controller.degreesToRadians(1);
-                //up
+            //up
             }else if (e.keyCode === 38) {
                 cameraRig.rotation.x+=controller.degreesToRadians(1);
-                //down
+            //down
             }else if (e.keyCode === 40) {
                 cameraRig.rotation.x-=controller.degreesToRadians(1);
-                //add
+            //add
             }else if (e.keyCode === 107) {
-               //this zooming doesnt work..for now
+                //this zooming doesnt work..for now
                 cameraRig.scale.x+=0.1;
                 cameraRig.scale.y+=0.1;
                 cameraRig.scale.z+=0.1;
 
-                //subtract
+            //subtract
             }else if (e.keyCode === 109) {
                 cameraRig.scale.x-=0.1;
                 cameraRig.scale.y-=0.1;
@@ -158,7 +171,7 @@ App.Stages.Galaxy = (function() {
             }, 500 )
             .start()
 
-            this.centerOn(xy,true) 
+            this.centerOn(xy) 
         },
 
         zoomOut: function(xy){
@@ -177,33 +190,37 @@ App.Stages.Galaxy = (function() {
             }, 500 )
             .start()
 
-            this.centerOn(xy, true) 
+            this.centerOn(xy) 
         },
 
         //moves the stars so that position is at the center of the screen
-        centerOn: function(mousePosition,zooming){
-            zooming = zooming || false;
+        centerOn: function(mousePosition){
             var position;
-
+       
             if (mousePosition === undefined) {
-                position = {x: 0, y: 0, z: 0};
+                position = {
+                    x: 0, 
+                    y: 0, 
+                    z: 0
+                };
             } else {
                 var z = 0;
                 position = controller.getWorldXYZ(camera,mousePosition,z);
-            }
-            //calculating partial traveling distance
-            if (zooming) {
-                var travelvector =  position.subSelf( camera.position );
-                travelvector = travelvector.multiplyScalar(1);
-
-                position.x = camera.position.x  + travelvector.x;
-                position.y = camera.position.y  + travelvector.y;
-            }
+            }           
             new TWEEN.Tween( cameraRig.position )
             .to({
                 x: position.x,
                 y: position.y
             }, 500 )
+            .onUpdate(function(){
+
+                cameraRig.matrixWorldNeedsUpdate = true;
+                camera.matrixWorldNeedsUpdate = true;
+                scene.matrixWorldNeedsUpdate = true;
+                scene.updateMatrixWorld(); 
+
+                
+            })
             .start()
 
 
@@ -220,11 +237,14 @@ App.Stages.Galaxy = (function() {
 
             var clickX= event.pageX - $(event.target).position().left;
             var clickY= event.pageY - $(event.target).position().top;
-
+            var mouseXY = {
+                x:clickX,
+                y:clickY
+            };
             if(delta>0){
-                this.zoomIn({x:clickX,y:clickY});
+                this.zoomIn(mouseXY);
             }else{                                                      
-                this.zoomOut({x:clickX,y:clickY});            
+                this.zoomOut(mouseXY);            
             }
 
         },
@@ -234,7 +254,10 @@ App.Stages.Galaxy = (function() {
             var clickX= event.pageX - $(event.target).position().left;
             var clickY= event.pageY - $(event.target).position().top;
 
-            this.centerOn({x: clickX, y: clickY});
+            this.centerOn({
+                x: clickX, 
+                y: clickY
+            });
         },
 
         onMouseMove: function(event) {

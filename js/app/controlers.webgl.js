@@ -9,7 +9,7 @@ App.Controllers.webgl = (function() {
     FPS = 60,
     MAX_FRAME_SKIP = 10,
     SKIP_TICKS = 1000 / FPS;
-
+    var projScreenMat = new THREE.Matrix4();
     return {
 
         // App variables
@@ -27,9 +27,8 @@ App.Controllers.webgl = (function() {
             this.projector = new THREE.Projector();
 
             // Create renderer
-            this.renderer = new THREE.WebGLRenderer( {
-                clearColor: 0x000000
-            } );
+            this.renderer = new THREE.WebGLRenderer( );
+            this.renderer.setClearColor( 0xff0000, 1 );
             this.renderer.setSize( this.jqDiv.width(), this.jqDiv.height() );
             // initialize fps counter
             stats = new Stats(); 
@@ -94,7 +93,7 @@ App.Controllers.webgl = (function() {
         getWorldXYZ:function(camera,xyPosition,z){
 
             var mousex = ( xyPosition.x / this.jqDiv.width() ) * 2 - 1;
-            var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 + 1;
+            var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 - 1;
           
             var vector = new THREE.Vector3( -mousex, mousey, -1 );
 
@@ -119,11 +118,11 @@ App.Controllers.webgl = (function() {
         radiansToDegrees:function(radians){
             return (eval(radians))*(180/Math.PI);
         },
-        toScreenXY:function( position, camera) {
-
-            var pos = position.clone();
-            projScreenMat = new THREE.Matrix4();
+        toScreenPrepare:function(camera){
             projScreenMat.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+        },
+        toScreenXY:function( position) {
+            var pos = position.clone();
             projScreenMat.multiplyVector3( pos );
             return pos;
 

@@ -11,10 +11,7 @@ App.Stages.Galaxy = (function() {
     var zoomLevelCount = 35; 
     var controller;
     var particleSystem;
-    var starSize = 3;
-
-    //used for calculating star size with respect to camera z location
-    var currentStarSize = 10;
+    var starSize = 10;
 
     //flag for when the CTRL key is pressed
     var ctrPressed = false;
@@ -80,10 +77,13 @@ App.Stages.Galaxy = (function() {
             }
 
             var starMaterial = new THREE.ParticleBasicMaterial( { 
+               
                 size: starSize, 
                 map: THREE.ImageUtils.loadTexture( "images/star-sprite.png" ),
-                blending: THREE.AdditiveBlending,
-                vertexColors: true
+                vertexColors: true,
+                blending:THREE.AdditiveBlending,
+                depthTest:false
+      
             } );
 
             //declare particle system with material 0
@@ -177,27 +177,22 @@ App.Stages.Galaxy = (function() {
         getClosestStar:function(xy){
             xy.x = ( xy.x / controller.jqDiv.width() ) * 2 - 1;
             xy.y =  -( xy.y / controller.jqDiv.height()) * 2 + 1;
-          
-            var target = null;
-            var targetDistance;
+            controller.toScreenPrepare(camera);
+            var target = starlist[0];
+            var targetDistance = 9999;
+            
             for (var i = 0; i < starlist.length; i ++ ) {
                 if(starlist[i].focused){
-                    starlist[i].focused =  false;
+                    starlist[i].focused = false;
                 } 
                 var vector = new THREE.Vector3( starlist[i].x, starlist[i].y, starlist[i].z );
-                var pos2d =  controller.toScreenXY(vector,camera);
-
-                if ((Math.abs(pos2d.x - xy.x) < 20) && (Math.abs(pos2d.y - xy.y) < 20)){
-                    var distanceX = Math.abs(pos2d.x - xy.x);
-                    var distanceY = Math.abs(pos2d.y - xy.y);
-                    var distance =  Math.sqrt(distanceX*distanceX+distanceY*distanceY);
-                    if(target === null){
-                        target = starlist[i];  
-                        targetDistance = distance ;
-                    }else if(targetDistance > distance){
-                        target = starlist[i];  
-                        targetDistance = distance ;  
-                    }
+                var pos2d =  controller.toScreenXY(vector);
+                var distanceX = Math.abs(pos2d.x - xy.x);
+                var distanceY = Math.abs(pos2d.y - xy.y);
+                var distance =  Math.sqrt(distanceX*distanceX+distanceY*distanceY);
+                if(targetDistance > distance){
+                    target = starlist[i];  
+                    targetDistance = distance ;  
                 }
             }
             return target;
@@ -232,20 +227,22 @@ App.Stages.Galaxy = (function() {
                     z: 0
                 };
             } else {
-                //   var z = 0;
-                //    position = controller.getWorldXYZ(camera,mousePosition,z);
-                position = this.getClosestStar(mousePosition);
+                //method 1:look for intersection with z plane
+                var z = 0;
+                position = controller.getWorldXYZ(camera,mousePosition,z);
+            //method 2:look for closest star to cursor
+            // position = this.getClosestStar(mousePosition);
                 
             }         
-            debugger;
-            if(position !== null){
-                new TWEEN.Tween( cameraRig.position )
-                .to({
-                    x: position.x,
-                    y: position.y
-                }, 500 )
-                .start()
-            }
+     
+            new TWEEN.Tween( cameraRig.position )
+            .to({
+                x: position.x,
+                y: position.y,
+                z:position.z
+            }, 500 )
+            .start()
+          
 
         },
 

@@ -27,10 +27,12 @@ App.Controllers.webgl = (function() {
             this.projector = new THREE.Projector();
 
             // Create renderer
-            this.renderer = new THREE.WebGLRenderer( { clearColor: 0x000000 } );
+            this.renderer = new THREE.WebGLRenderer( {
+                clearColor: 0x000000
+            } );
             this.renderer.setSize( this.jqDiv.width(), this.jqDiv.height() );
             // initialize fps counter
-            stats = new Stats(); ;
+            stats = new Stats(); 
             stats.domElement.style.position = 'absolute';
             stats.domElement.style.top = '75px';
             stats.domElement.style.right = '0px';
@@ -93,46 +95,33 @@ App.Controllers.webgl = (function() {
 
             var mousex = ( xyPosition.x / this.jqDiv.width() ) * 2 - 1;
             var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 - 1;
+            //taking parent object into account it doesnt work for scale(wornder why?)
+            //       var origin = new THREE.Vector3((camera.position.x+camera.parent.position.x),
+            //       (camera.position.y+camera.parent.position.y),
+            //       (camera.position.z+camera.parent.position.z));
+            var vector = new THREE.Vector3( -mousex, mousey, 1 );
 
-            var origin = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
-
-            var vector = new THREE.Vector3( -mousex, mousey, -1 );
             this.projector.unprojectVector( vector, camera );
+            vector.multiplyScalar(-1);
+         vector=   camera.matrixRotationWorld.multiplyVector3(vector);
+            vector.multiplyScalar(-1);
+            
+            var origin = camera.matrixWorld.getPosition();
+
             vector =  vector.subSelf( origin ).normalize();
-            var scalar =(origin.z  - z)/vector.z;   
+            var scalar =(origin.z -z  )/vector.z;   
 
             var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
+ 
             intersection.z = z;
             return intersection;
         },
-        //rotates a vectorbyX
-        rotateVectorX: function (vector,angle){
-            var length = Math.sqrt(vector.y*vector.y + vector.z*vector.z);
-            var adjanced = cos(angle)*length;
-            var oposite = sin(angle)*length;
-
-            if(vector.z<0)adjanced *=-1;
-            if(vector.y<0)oposite *=-1;
-
-            return {
-                x: vector.x,
-                y: oposite,
-                z: adjanced
-            };
-
-
+        //helpful functions
+        degreesToRadians:function(degrees){
+            return (eval(degrees))*(Math.PI/180);
         },
-        //rotates a vectorbyY
-        rotateVectorY: function (vector,degrees) {
-            var length = Math.sqrt(vector.x*vector.x + vector.z*vector.z);
-            var adjanced = cos(angle)*length;
-            var oposite = sin(angle)*length;
-
-            return {
-                x: adjanced,
-                y: vector.y,
-                z: oposite
-            };
+        radiansToDegrees:function(radians){
+            return (eval(radians))*(180/Math.PI);
         },
         //pass the event handling to proper stage
         _event:function(event,delta){

@@ -11,10 +11,7 @@ App.Stages.Galaxy = (function() {
     var zoomLevelCount = 35; 
     var controller;
     var particleSystem;
-    var starSize = 3;
-
-    //used for calculating star size with respect to camera z location
-    var currentStarSize = 10;
+    var starSize = 10;
 
     //flag for when the CTRL key is pressed
     var ctrPressed = false;
@@ -41,6 +38,7 @@ App.Stages.Galaxy = (function() {
             controller = webgl;
             //get list of stars from the generator function(for now)
             starlist = createStars();
+            
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 90, controller.jqDiv.width() / controller.jqDiv.height(), 1, 30000 );
             camera.position= {
@@ -79,10 +77,13 @@ App.Stages.Galaxy = (function() {
             }
 
             var starMaterial = new THREE.ParticleBasicMaterial( { 
+               
                 size: starSize, 
                 map: THREE.ImageUtils.loadTexture( "images/star-sprite.png" ),
-                blending: THREE.AdditiveBlending,
-                vertexColors: true
+                vertexColors: true,
+                blending:THREE.AdditiveBlending,
+                depthTest:false
+      
             } );
 
             //declare particle system with material 0
@@ -126,16 +127,16 @@ App.Stages.Galaxy = (function() {
                 console.debug(cameraRig);
             //left
             }else if (e.keyCode === 37) {
-                cameraRig.rotation.y+=controller.degreesToRadians(1);
+                cameraRig.rotation.y -= controller.degreesToRadians(1);
             //right
             }else if (e.keyCode === 39) {
-                cameraRig.rotation.y-=controller.degreesToRadians(1);
+                cameraRig.rotation.y += controller.degreesToRadians(1);
             //up
             }else if (e.keyCode === 38) {
-                cameraRig.rotation.x+=controller.degreesToRadians(1);
+                cameraRig.rotation.x -= controller.degreesToRadians(1);
             //down
             }else if (e.keyCode === 40) {
-                cameraRig.rotation.x-=controller.degreesToRadians(1);
+                cameraRig.rotation.x += controller.degreesToRadians(1);
             //add
             }else if (e.keyCode === 107) {
                 //this zooming doesnt work..for now
@@ -173,7 +174,29 @@ App.Stages.Galaxy = (function() {
 
             this.centerOn(xy) 
         },
-
+        getClosestStar:function(xy){
+            xy.x = ( xy.x / controller.jqDiv.width() ) * 2 - 1;
+            xy.y =  -( xy.y / controller.jqDiv.height()) * 2 + 1;
+            controller.toScreenPrepare(camera);
+            var target = starlist[0];
+            var targetDistance = 9999;
+            
+            for (var i = 0; i < starlist.length; i ++ ) {
+                if(starlist[i].focused){
+                    starlist[i].focused = false;
+                } 
+                var vector = new THREE.Vector3( starlist[i].x, starlist[i].y, starlist[i].z );
+                var pos2d =  controller.toScreenXY(vector);
+                var distanceX = Math.abs(pos2d.x - xy.x);
+                var distanceY = Math.abs(pos2d.y - xy.y);
+                var distance =  Math.sqrt(distanceX*distanceX+distanceY*distanceY);
+                if(targetDistance > distance){
+                    target = starlist[i];  
+                    targetDistance = distance ;  
+                }
+            }
+            return target;
+        },
         zoomOut: function(xy){
             var levelOne = false
             //change the current zoom level
@@ -204,25 +227,22 @@ App.Stages.Galaxy = (function() {
                     z: 0
                 };
             } else {
+                //method 1:look for intersection with z plane
                 var z = 0;
                 position = controller.getWorldXYZ(camera,mousePosition,z);
-            }           
+            //method 2:look for closest star to cursor
+            // position = this.getClosestStar(mousePosition);
+                
+            }         
+     
             new TWEEN.Tween( cameraRig.position )
             .to({
                 x: position.x,
-                y: position.y
+                y: position.y,
+                z:position.z
             }, 500 )
-            .onUpdate(function(){
-
-                cameraRig.matrixWorldNeedsUpdate = true;
-                camera.matrixWorldNeedsUpdate = true;
-                scene.matrixWorldNeedsUpdate = true;
-                scene.updateMatrixWorld(); 
-
-                
-            })
             .start()
-
+          
 
         },
 
@@ -251,12 +271,10 @@ App.Stages.Galaxy = (function() {
         //mouseclick handler
         onMouseClick: function(event){
 
-            var clickX= event.pageX - $(event.target).position().left;
-            var clickY= event.pageY - $(event.target).position().top;
-
+          
             this.centerOn({
-                x: clickX, 
-                y: clickY
+                x: event.offsetX, 
+                y: event.offsetY
             });
         },
 

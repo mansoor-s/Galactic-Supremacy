@@ -31,7 +31,7 @@ App.Stages.Galaxy = (function() {
     //postprocessing
     var renderModel = false;
     var composer = false;
-    var filmPass = new THREE.BloomPass(1);
+    var filmPass = new THREE.BloomPass(5);
     var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
     effectScreen.renderToScreen = true;
     //this is where the camea will look at when free camera is enable
@@ -83,13 +83,12 @@ App.Stages.Galaxy = (function() {
             }
 
             var starMaterial = new THREE.ParticleBasicMaterial( { 
-               color:0xffffff,
-                size: starSize 
-     //           map: THREE.ImageUtils.loadTexture( "images/star-sprite.png" ),
-  //              vertexColors: true,
-   //             blending:THREE.AdditiveBlending,
-  //              depthTest:false
-      
+                size: starSize, 
+                map: THREE.ImageUtils.loadTexture( "images/sprite2.png" ),
+                vertexColors: true,
+                blending:THREE.AdditiveBlending,
+   //             depthTest:false,
+      alphaTest: .5
             } );
 
             //declare particle system with material 0
@@ -129,7 +128,7 @@ App.Stages.Galaxy = (function() {
             controller.renderer.clear();
             composer.render(0.05);
          
-          controller.renderer.render(scene,camera);
+         //   controller.renderer.render(scene,camera);
 
         },
 

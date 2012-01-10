@@ -28,6 +28,12 @@ App.Stages.Galaxy = (function() {
         y: 0
     };
 
+    //postprocessing
+    var renderModel = false;
+    var composer = false;
+    var filmPass = new THREE.BloomPass(5);
+    var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+    effectScreen.renderToScreen = true;
     //this is where the camea will look at when free camera is enable
     //ivankuzev:i am making it object3d so i can use all of its functions
     //rotations and scale too
@@ -77,13 +83,12 @@ App.Stages.Galaxy = (function() {
             }
 
             var starMaterial = new THREE.ParticleBasicMaterial( { 
-               
                 size: starSize, 
-                map: THREE.ImageUtils.loadTexture( "images/star-sprite.png" ),
+                map: THREE.ImageUtils.loadTexture( "images/sprite2.png" ),
                 vertexColors: true,
                 blending:THREE.AdditiveBlending,
-                depthTest:false
-      
+   //             depthTest:false,
+      alphaTest: .5
             } );
 
             //declare particle system with material 0
@@ -95,6 +100,11 @@ App.Stages.Galaxy = (function() {
             //add it to the scene
             scene.add(cameraRig);
             scene.add( particleSystem );
+            //initialize postprocessing
+
+            renderModel = new THREE.RenderPass( scene, camera );
+            composer = new THREE.EffectComposer( controller.renderer );
+            composer.passes = [renderModel, filmPass, effectScreen];
 
         },
 
@@ -114,8 +124,11 @@ App.Stages.Galaxy = (function() {
                     z: 0
                 } ); 
             }
-
-            controller.renderer.render(scene,camera);
+            //postprocessing render
+            controller.renderer.clear();
+            composer.render(0.05);
+         
+         //   controller.renderer.render(scene,camera);
 
         },
 

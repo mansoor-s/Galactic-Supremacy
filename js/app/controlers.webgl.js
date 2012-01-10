@@ -29,6 +29,7 @@ App.Controllers.webgl = (function() {
             // Create renderer
             this.renderer = new THREE.WebGLRenderer( );
             this.renderer.setClearColor( 0xff0000, 1 );
+            this.renderer.autoClear = false;
             this.renderer.setSize( this.jqDiv.width(), this.jqDiv.height() );
             // initialize fps counter
             stats = new Stats(); 

@@ -133,4 +133,4 @@ App.Controllers.webgl = (function() {
             currentStage._event(event,delta);
         }
     };
-})();
+}());

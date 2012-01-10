@@ -11,7 +11,7 @@ App.Stages.Galaxy = (function() {
     var zoomLevelCount = 35; 
     var controller;
     var particleSystem;
-    var starSize = 10;
+    var starSize = 20;
 
     //flag for when the CTRL key is pressed
     var ctrPressed = false;
@@ -31,7 +31,7 @@ App.Stages.Galaxy = (function() {
     //postprocessing
     var renderModel = false;
     var composer = false;
-    var filmPass = new THREE.BloomPass(5);
+    var filmPass = new THREE.BloomPass(4);
     var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
     effectScreen.renderToScreen = true;
     //this is where the camea will look at when free camera is enable
@@ -313,4 +313,4 @@ App.Stages.Galaxy = (function() {
             }
         }
     }
-})();
+}());

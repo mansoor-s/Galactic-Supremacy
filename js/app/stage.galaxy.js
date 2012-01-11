@@ -8,10 +8,10 @@ App.Stages.Galaxy = (function() {
     var nearestCameraPosition = 200;
     //the levels of zoom
     var zoomLevelCurrent = 0;//
-    var zoomLevelCount = 35; 
+    var zoomLevelCount = 37; 
     var controller;
     var particleSystem;
-    var starSize = 20;
+    var starSize = 5;
 
     //flag for when the CTRL key is pressed
     var ctrPressed = false;
@@ -29,11 +29,11 @@ App.Stages.Galaxy = (function() {
     };
 
     //postprocessing
-    var renderModel = false;
-    var composer = false;
-    var filmPass = new THREE.BloomPass(4);
+    var renderModel, composer;
+    var filmPass = new THREE.BloomPass(2.5, 25, 4.0);
     var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
     effectScreen.renderToScreen = true;
+	
     //this is where the camea will look at when free camera is enable
     //ivankuzev:i am making it object3d so i can use all of its functions
     //rotations and scale too
@@ -86,9 +86,9 @@ App.Stages.Galaxy = (function() {
                 size: starSize, 
                 map: THREE.ImageUtils.loadTexture( "images/sprite2.png" ),
                 vertexColors: true,
-                blending:THREE.AdditiveBlending,
+                //blending:THREE.AdditiveBlending,
    //             depthTest:false,
-      alphaTest: .5
+				alphaTest: .5
             } );
 
             //declare particle system with material 0
@@ -96,8 +96,7 @@ App.Stages.Galaxy = (function() {
             particleSystem.dynamic = true;
 
 
-
-            //add it to the scene
+            //add it to the scenes
             scene.add(cameraRig);
             scene.add( particleSystem );
             //initialize postprocessing
@@ -313,4 +312,4 @@ App.Stages.Galaxy = (function() {
             }
         }
     }
-}());
+})();

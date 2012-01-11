@@ -3,8 +3,8 @@ function createStars() {
         x: .6,//675,
         y: .6
     }
-    var zRandomOffsetRange = 120;
-    var starsPerArm = 100000;
+    var zRandomOffsetRange = 175;
+    var starsPerArm = 125000;
     var randomOffsetRange = 2000;
     var A = 4000;
     xTransform = spiralTransformations.x || .6;  // "scale. higher = more zoomed in"

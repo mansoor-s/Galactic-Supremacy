@@ -7,7 +7,7 @@ systemData = {
     {
         name: "SOL1",
         type: "terran",
-        distance: 1.2,
+        distance: 5,
         size: 1.5,
         map: "terran1",
         moons: [
@@ -21,7 +21,7 @@ systemData = {
     {
         name: "SOL2",
         type: "volcanic",
-        distance: 2.5,
+        distance: 10,
         size: 0.8,
         map: "volcanic3",
         moons: [
@@ -31,7 +31,7 @@ systemData = {
     {
         name: "SOL1",
         type: "gasgiant",
-        distance: 4.3,
+        distance: 20,
         size: 4.5,
         map: "gass5",
         moons: [

@@ -20,4 +20,4 @@ App.Controllers.App = (function() {
             */
         }
     };
-})();
+}());

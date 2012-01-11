@@ -1347,7 +1347,7 @@ THREE.ShaderExtras = {
 
 		}
 
-		var i, values, sum, halfWidth, kMaxKernelSize = 25, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
+		var i, values, sum, halfWidth, kMaxKernelSize = 100, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
 
 		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
 		halfWidth = ( kernelSize - 1 ) * 0.5

@@ -1,50 +1,61 @@
-{
-    "stars" : [
-    { 
-        "x": 400,
-        "y": 300,
-        "color": "blue"
+systemData = {
+    star: {
+        type: "g",
+        size: 1.9
     },
-    { 
-        "x": 340,
-        "y": 280,
-        "color": "red"
+    planets: [
+    {
+        name: "SOL1",
+        type: "terran",
+        distance: 1.2,
+        size: 1.5,
+        map: "terran1",
+        moons: [
+        {
+            name: "mooon1",
+            type: "barren",
+            map: "barren2"
+        }
+        ]
     },
-    { 
-        "x": -10,
-        "y": 200,
-        "color": "green"
+    {
+        name: "SOL2",
+        type: "volcanic",
+        distance: 2.5,
+        size: 0.8,
+        map: "volcanic3",
+        moons: [
+    ]
     },
-    { 
-        "x": 0,
-        "y": 0,
-        "color": "blue"
-    },
-    { 
-        "x": -13,
-        "y": -300,
-        "color": "green"
-    },
-    { 
-        "x": -500,
-        "y": 500,
-        "color": "blue"
-    },
-    { 
-        "x": 564,
-        "y": 456,
-        "color": "red"
-    },
-    { 
-        "x": -51,
-        "y": -54,
-        "color": "blue"
-    },
-    { 
-        "x": -423,
-        "y": -123,
-        "color": "red"
+		
+    {
+        name: "SOL1",
+        type: "gasgiant",
+        distance: 4.3,
+        size: 4.5,
+        map: "gass5",
+        moons: [
+        {
+            name: "mooon1",
+            type: "barren",
+            map: "barren2"
+        },
+        {
+            name: "moon2",
+            type: "ice",
+            map: "ice3"
+        },
+        {
+            name: "moon3",
+            type: "desert",
+            map: "desert1"
+        }
+        ]
+    }
+    ],
+    astroids: [
+    {
+			
     }
     ]
-
 }

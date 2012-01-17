@@ -10,9 +10,9 @@ App.Stages.StarSystem = (function() {
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 200 );
             camera.position= {
-                x: 0, 
-                y: 40, 
-                z: 50
+                x: 50, 
+                y: 60, 
+                z: 30
             };  
             camera.matrixAutoUpdate = true;
             camera.lookAt({
@@ -50,21 +50,36 @@ App.Stages.StarSystem = (function() {
             materials['volcanic'] = new THREE.MeshLambertMaterial(
             {
                 color: 0x880000,
-               ambient: 0x550000
+                ambient: 0x550000
             });
             materials['gasgiant'] = new THREE.MeshLambertMaterial(
             {
                 ambient: 0x005500,
-                 color: 0x008800
+                color: 0x008800
+            });
+            materials['desert'] = new THREE.MeshLambertMaterial(
+            {
+                ambient: 0x555500,
+                color: 0x888800
+            });
+            materials['barren'] = new THREE.MeshLambertMaterial(
+            {
+                ambient: 0x550055,
+                color: 0x880055
             });
             materials['terran'] = new THREE.MeshLambertMaterial(
             {
                 ambient: 0x00055,
-                 color: 0x000088
+                color: 0x000088
+            });
+            materials['ice'] = new THREE.MeshLambertMaterial(
+            {
+                ambient: 0x05555,
+                color: 0x008888
             });
         },
         _initializeLights:function(){
-           scene.add( new THREE.AmbientLight( 0xffffff ) );
+            scene.add( new THREE.AmbientLight( 0xffffff ) );
 
             // create a point light
             scene.add( new THREE.PointLight( 0xFFFFFF ,1));
@@ -76,15 +91,41 @@ App.Stages.StarSystem = (function() {
             star.scale.multiplyScalar(data.star.size)
             star.tag = {
                 object:'star',
-                type:data.star.type
+                data:data.star,
+                parent:scene
             }
             scene.add( star );
-            //todo planet enumeration 
+            //matrix that will rotate the vectors
+            var rotatingMatrix = new THREE.Matrix4();
             for(var i = 0;i<data.planets.length;i++){
                 var planet = new THREE.Mesh( meshes['sphere'], materials[data.planets[i].type] );
                 planet.scale.multiplyScalar(data.planets[i].size);
-                planet.position.set(1,0,0).multiplyScalar(data.planets[i].distance)
+                planet.position.set(1,0,0);
+                rotatingMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].orbit));
+                rotatingMatrix.multiplyVector3(planet.position);
+                
+                planet.position.multiplyScalar(data.planets[i].distance)
+                planet.tag = {
+                    object:'planet'+i,
+                    data:data.planets[i],
+                    parent:scene
+                }
                 scene.add( planet );
+                for(var i2 = 0;i2<data.planets[i].moons.length;i2++){
+                    var moon = new THREE.Mesh( meshes['sphere'], materials[data.planets[i].moons[i2].type] );
+                    moon.scale.multiplyScalar(0.5);
+                    moon.position.set(1,0,0)
+                    rotatingMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].moons[i2].orbit));
+                    rotatingMatrix.multiplyVector3(moon.position);
+                    moon.position.multiplyScalar(i2+1+data.planets[i].size).addSelf(planet.position);
+                    moon.tag = {
+                        object:'moon'+i,
+                        data:data.planets[i].moons[i2],
+                        parent:planet
+                    }
+                    scene.add( moon );
+                }
+             
             }
             
             
@@ -115,4 +156,4 @@ App.Stages.StarSystem = (function() {
             }
         }
     }
-})();
+}());

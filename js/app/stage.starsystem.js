@@ -4,7 +4,9 @@ App.Stages.StarSystem = (function() {
     var camera;
     var materials = {};
     var meshes = {};
+    var shapes = {};
     //keeps the intersected object for now
+    var torus;
     var INTERSECTED;
     return {
         initialize:function (webgl) {
@@ -38,14 +40,31 @@ App.Stages.StarSystem = (function() {
         },
         _initializeGeometry:function(){
             meshes['sphere'] = new THREE.SphereGeometry( 1, 32, 16 );
-            
+            meshes['torus'] = new THREE.TorusGeometry(1, 0.1, 8, 30)
+            shapes['circle'] = new THREE.Shape();
+            shapes['circle'].moveTo(0,0);
+            shapes['circle'].arc( 0, 0, 1, 0, Math.PI*2, false );
+
 
           
         },
         _initializeMaterials:function(){
             //initialized all materials
             //todo:add also textured materials
-            
+          
+            materials['torus'] = new THREE.MeshLambertMaterial( {
+                ambient:0x008888,
+                color: 0x00ffff
+            } ); 
+            materials['grid'] =  new THREE.LineBasicMaterial( {
+                color: 0x293A45, 
+                opacity: 0.9 
+            } );
+
+            materials['wireframe'] = new THREE.MeshBasicMaterial( {
+                color: 0x293A45, 
+                wireframe: true
+            } );
             materials['star'] = new THREE.MeshLambertMaterial(
             {
                 ambient:0xffffff,
@@ -90,6 +109,18 @@ App.Stages.StarSystem = (function() {
         },
         //shows differend system depending on the data given
         showSystem: function(data){
+            //adding torus
+            torus = new THREE.Mesh(meshes['torus'],materials['torus']);
+            torus.rotation.x = controller.degreesToRadians(90);
+            torus.scale.multiplyScalar(data.star.size);
+            torus.tag={
+                object:'torus', 
+                parent:scene
+            }
+            scene.add(torus);
+                     
+           
+            //adding solar objects
             var star = new THREE.Mesh( meshes['sphere'], materials['star'] );
             //since default size of the meshes is 1 ..we just multiply
             //it by the size of the object
@@ -117,6 +148,16 @@ App.Stages.StarSystem = (function() {
                     parent:scene
                 }
                 scene.add( planet );
+                var grid  = new THREE.Line( shapes['circle'].createPointsGeometry(),materials['grid'])
+                grid.rotation.x = controller.degreesToRadians(90);
+                grid.scale.multiplyScalar(data.planets[i].distance)
+         
+                grid.tag={
+                    object:'grid'+i, 
+                    parent:scene
+                }
+           
+                scene.add(grid);
                 for(var i2 = 0;i2<data.planets[i].moons.length;i2++){
                     var moon = new THREE.Mesh( meshes['sphere'], materials[data.planets[i].moons[i2].type] );
                     moon.scale.multiplyScalar(0.5);
@@ -133,6 +174,17 @@ App.Stages.StarSystem = (function() {
                         parent:planet
                     }
                     scene.add( moon );
+                    grid  = new THREE.Line( shapes['circle'].createPointsGeometry(),materials['grid'])
+                    grid.rotation.x = controller.degreesToRadians(90);
+                    //distance from planet
+                    grid.scale.multiplyScalar(i2+1+data.planets[i].size)
+                    grid.position = planet.position.clone();
+                    grid.tag={
+                        object:'grid'+i, 
+                        parent:scene
+                    }
+           
+                    scene.add(grid);
                 }
              
             }
@@ -169,24 +221,14 @@ App.Stages.StarSystem = (function() {
             if ( intersects.length > 0 ) {
                 if ( INTERSECTED != intersects[ 0 ].object ) {
 
-                    if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-                    if ( INTERSECTED ) INTERSECTED.material.ambient.setHex( INTERSECTED.currentHexA );
-
+                    torus.position=intersects[ 0 ].object.position.clone();
+                    torus.scale = intersects[ 0 ].object.scale.clone();
                     INTERSECTED = intersects[ 0 ].object;
-                    INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-                    INTERSECTED.currentHexA = INTERSECTED.material.ambient.getHex();
-                    INTERSECTED.material.color.setHex( 0xff0000 );
-                    INTERSECTED.material.ambient.setHex( 0xff0000 );
-
                 }
 
             } else {
-
-                if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-                if ( INTERSECTED ) INTERSECTED.material.ambient.setHex( INTERSECTED.currentHexA );
-
                 INTERSECTED = null;
-
+                torus.position = scene.position.clone()
             }
         },
         //use it like "eventname":"functionname"

@@ -10,10 +10,12 @@ systemData = {
         distance: 5,
         size: 1.5,
         map: "terran1",
+        orbit:0.1,
         moons: [
         {
             name: "mooon1",
             type: "barren",
+            orbit:0,
             map: "barren2"
         }
         ]
@@ -24,6 +26,7 @@ systemData = {
         distance: 10,
         size: 0.8,
         map: "volcanic3",
+        orbit:0.5,
         moons: [
     ]
     },
@@ -34,19 +37,23 @@ systemData = {
         distance: 20,
         size: 4.5,
         map: "gass5",
+        orbit:0.8,
         moons: [
         {
             name: "mooon1",
+            orbit:0.66,
             type: "barren",
             map: "barren2"
         },
         {
             name: "moon2",
+            orbit:0.63,
             type: "ice",
             map: "ice3"
         },
         {
             name: "moon3",
+            orbit:0.6,
             type: "desert",
             map: "desert1"
         }

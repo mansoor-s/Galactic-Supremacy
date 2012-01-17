@@ -37,7 +37,7 @@ systemData = {
         distance: 20,
         size: 4.5,
         map: "gass5",
-        orbit:0.1,
+        orbit:0.8,
         moons: [
         {
             name: "mooon1",

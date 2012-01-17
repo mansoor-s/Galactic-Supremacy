@@ -1,8 +1,11 @@
 App.Stages.StarSystem = (function() { 
-    var controller,scene,camera;
-    
+    var controller;
+    var scene;
+    var camera;
     var materials = {};
     var meshes = {};
+    //keeps the intersected object for now
+    var INTERSECTED;
     return {
         initialize:function (webgl) {
             controller = webgl;
@@ -40,7 +43,8 @@ App.Stages.StarSystem = (function() {
           
         },
         _initializeMaterials:function(){
-            //todo: textured materials
+            //initialized all materials
+            //todo:add also textured materials
             
             materials['star'] = new THREE.MeshLambertMaterial(
             {
@@ -86,9 +90,11 @@ App.Stages.StarSystem = (function() {
         },
         //shows differend system depending on the data given
         showSystem: function(data){
-            //
             var star = new THREE.Mesh( meshes['sphere'], materials['star'] );
+            //since default size of the meshes is 1 ..we just multiply
+            //it by the size of the object
             star.scale.multiplyScalar(data.star.size)
+            //adding some meta data to keep track of the object more easily
             star.tag = {
                 object:'star',
                 data:data.star,
@@ -100,11 +106,11 @@ App.Stages.StarSystem = (function() {
             for(var i = 0;i<data.planets.length;i++){
                 var planet = new THREE.Mesh( meshes['sphere'], materials[data.planets[i].type] );
                 planet.scale.multiplyScalar(data.planets[i].size);
-                planet.position.set(1,0,0);
+                //set the position.and then rotate it...
+                planet.position.set(1,0,0).multiplyScalar(data.planets[i].distance);
                 rotatingMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].orbit));
                 rotatingMatrix.multiplyVector3(planet.position);
-                
-                planet.position.multiplyScalar(data.planets[i].distance)
+          
                 planet.tag = {
                     object:'planet'+i,
                     data:data.planets[i],
@@ -114,10 +120,13 @@ App.Stages.StarSystem = (function() {
                 for(var i2 = 0;i2<data.planets[i].moons.length;i2++){
                     var moon = new THREE.Mesh( meshes['sphere'], materials[data.planets[i].moons[i2].type] );
                     moon.scale.multiplyScalar(0.5);
-                    moon.position.set(1,0,0)
+                    //set distance(from planet)
+                    moon.position.set(1,0,0).multiplyScalar(i2+1+data.planets[i].size);
+                    //rotate
                     rotatingMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].moons[i2].orbit));
                     rotatingMatrix.multiplyVector3(moon.position);
-                    moon.position.multiplyScalar(i2+1+data.planets[i].size).addSelf(planet.position);
+                    //add planet position
+                    moon.position.addSelf(planet.position);
                     moon.tag = {
                         object:'moon'+i,
                         data:data.planets[i].moons[i2],
@@ -136,16 +145,53 @@ App.Stages.StarSystem = (function() {
         },
         //render for stage
         render: function(){
-            //postprocessing render
+            //not used
+            //postprocessing render 
             //   controller.renderer.clear();
             //   composer.render(0.05);
          
             controller.renderer.render(scene,camera);
 
         },
+        onMouseClick:function(event){
+            var  mouse={};
+            //not sure if this will aways pick the correct mouse cordinates
+            mouse.x = ( event.clientX / controller.jqDiv.width()) * 2 - 1;
+            mouse.y = - ( event.clientY / controller.jqDiv.height()) * 2 + 1;
+            // find intersections
+            var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+            controller.projector.unprojectVector( vector, camera );
+            //use three.ray to find intersecting geometry
+            var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+
+            var intersects = ray.intersectScene( scene );
+
+            if ( intersects.length > 0 ) {
+                if ( INTERSECTED != intersects[ 0 ].object ) {
+
+                    if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+                    if ( INTERSECTED ) INTERSECTED.material.ambient.setHex( INTERSECTED.currentHexA );
+
+                    INTERSECTED = intersects[ 0 ].object;
+                    INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+                    INTERSECTED.currentHexA = INTERSECTED.material.ambient.getHex();
+                    INTERSECTED.material.color.setHex( 0xff0000 );
+                    INTERSECTED.material.ambient.setHex( 0xff0000 );
+
+                }
+
+            } else {
+
+                if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+                if ( INTERSECTED ) INTERSECTED.material.ambient.setHex( INTERSECTED.currentHexA );
+
+                INTERSECTED = null;
+
+            }
+        },
         //use it like "eventname":"functionname"
         events: {
-          
+            "click":"onMouseClick"
         },
         //event distribution
         _event:function(event,delta){

@@ -6,25 +6,24 @@ App.Stages.StarSystem = (function() {
     var meshes = {};
     var shapes = {};
     //keeps the intersected object for now
-    var torus;
-    var INTERSECTED;
+    var torus,torus2;
+    var SELECTED;
+    //camera controls
+    var cameraLookTarget = new THREE.Vector3(0,0,0);
+    var cameraDistance = 70;
+    var cameraRotations = new THREE.Vector3(45,0,0);
+    var rotationMatrix = new THREE.Matrix4();
+     
     return {
         initialize:function (webgl) {
             controller = webgl;
             
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 200 );
-            camera.position= {
-                x: 50, 
-                y: 60, 
-                z: 30
-            };  
+          
             camera.matrixAutoUpdate = true;
-            camera.lookAt({
-                x:0,
-                y:0,
-                z:0
-            });
+                
+          
             // Create scene
             scene = new THREE.Scene();
 
@@ -40,13 +39,10 @@ App.Stages.StarSystem = (function() {
         },
         _initializeGeometry:function(){
             meshes['sphere'] = new THREE.SphereGeometry( 1, 32, 16 );
-            meshes['torus'] = new THREE.TorusGeometry(1, 0.1, 8, 30)
+            meshes['torus'] = new THREE.TorusGeometry(1.2, 0.1, 2, 60)
             shapes['circle'] = new THREE.Shape();
             shapes['circle'].moveTo(0,0);
             shapes['circle'].arc( 0, 0, 1, 0, Math.PI*2, false );
-
-
-          
         },
         _initializeMaterials:function(){
             //initialized all materials
@@ -58,7 +54,8 @@ App.Stages.StarSystem = (function() {
             } ); 
             materials['grid'] =  new THREE.LineBasicMaterial( {
                 color: 0x293A45, 
-                opacity: 0.9 
+                opacity: 0.9, 
+                smooth:true // not sure if there is even smooth
             } );
 
             materials['wireframe'] = new THREE.MeshBasicMaterial( {
@@ -70,6 +67,12 @@ App.Stages.StarSystem = (function() {
                 ambient:0xffffff,
                 color: 0xffffff
             });
+            materials['desert'] = new THREE.MeshPhongMaterial(
+            {
+                color:0xFF0000,
+                map: THREE.ImageUtils.loadTexture( 'images/textures/desert1.png')
+  
+            });
             materials['volcanic'] = new THREE.MeshLambertMaterial(
             {
                 color: 0x880000,
@@ -80,11 +83,7 @@ App.Stages.StarSystem = (function() {
                 ambient: 0x005500,
                 color: 0x008800
             });
-            materials['desert'] = new THREE.MeshLambertMaterial(
-            {
-                ambient: 0x555500,
-                color: 0x888800
-            });
+          
             materials['barren'] = new THREE.MeshLambertMaterial(
             {
                 ambient: 0x550055,
@@ -111,15 +110,30 @@ App.Stages.StarSystem = (function() {
         showSystem: function(data){
             //adding torus
             torus = new THREE.Mesh(meshes['torus'],materials['torus']);
+            torus2 = new THREE.Mesh(meshes['torus'],materials['torus']);
             torus.rotation.x = controller.degreesToRadians(90);
+            torus2.rotation.x = controller.degreesToRadians(90);
             torus.scale.multiplyScalar(data.star.size);
             torus.tag={
                 object:'torus', 
                 parent:scene
             }
+            torus2.tag =  torus.tag;
+            
             scene.add(torus);
-                     
-           
+            torus.add(torus2);
+                
+            //tests with the tourus  
+            ta = new TWEEN.Tween( torus.rotation )
+            .to({
+                x:controller.degreesToRadians(450)
+            }, 4000 )
+            .onComplete(function(){
+                torus.rotation.x = controller.degreesToRadians(90);
+                ta.start();
+            })
+            .start()      
+                    
             //adding solar objects
             var star = new THREE.Mesh( meshes['sphere'], materials['star'] );
             //since default size of the meshes is 1 ..we just multiply
@@ -133,14 +147,13 @@ App.Stages.StarSystem = (function() {
             }
             scene.add( star );
             //matrix that will rotate the vectors
-            var rotatingMatrix = new THREE.Matrix4();
             for(var i = 0;i<data.planets.length;i++){
                 var planet = new THREE.Mesh( meshes['sphere'], materials[data.planets[i].type] );
                 planet.scale.multiplyScalar(data.planets[i].size);
                 //set the position.and then rotate it...
                 planet.position.set(1,0,0).multiplyScalar(data.planets[i].distance);
-                rotatingMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].orbit));
-                rotatingMatrix.multiplyVector3(planet.position);
+                rotationMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].orbit));
+                rotationMatrix.multiplyVector3(planet.position);
           
                 planet.tag = {
                     object:'planet'+i,
@@ -164,8 +177,8 @@ App.Stages.StarSystem = (function() {
                     //set distance(from planet)
                     moon.position.set(1,0,0).multiplyScalar(i2+1+data.planets[i].size);
                     //rotate
-                    rotatingMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].moons[i2].orbit));
-                    rotatingMatrix.multiplyVector3(moon.position);
+                    rotationMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].moons[i2].orbit));
+                    rotationMatrix.multiplyVector3(moon.position);
                     //add planet position
                     moon.position.addSelf(planet.position);
                     moon.tag = {
@@ -193,6 +206,21 @@ App.Stages.StarSystem = (function() {
         },
         //update the animation
         update: function(){
+            
+            var distanceVector = new THREE.Vector3(0,0,-cameraDistance);
+            rotationMatrix.setRotationX(controller.degreesToRadians(cameraRotations.x));
+            distanceVector = rotationMatrix.multiplyVector3(distanceVector);
+            rotationMatrix.setRotationY(controller.degreesToRadians(cameraRotations.y));
+            distanceVector = rotationMatrix.multiplyVector3(distanceVector);
+            
+            camera.position.x = cameraLookTarget.x;
+            camera.position.y = cameraLookTarget.y;
+            camera.position.z = cameraLookTarget.z;
+       
+            camera.position.addSelf(distanceVector);
+            
+            camera.lookAt(cameraLookTarget);
+            
             TWEEN.update();
         },
         //render for stage
@@ -219,21 +247,71 @@ App.Stages.StarSystem = (function() {
             var intersects = ray.intersectScene( scene );
 
             if ( intersects.length > 0 ) {
-                if ( INTERSECTED != intersects[ 0 ].object ) {
+                if ( SELECTED != intersects[ 0 ].object ) {
 
                     torus.position=intersects[ 0 ].object.position.clone();
                     torus.scale = intersects[ 0 ].object.scale.clone();
-                    INTERSECTED = intersects[ 0 ].object;
+                    SELECTED = intersects[ 0 ].object;
+                    
+                    new TWEEN.Tween( cameraLookTarget )
+                    .to(intersects[ 0 ].object.position, 1500 )
+                    .start()
+                    
                 }
 
             } else {
-                INTERSECTED = null;
+                SELECTED = null;
                 torus.position = scene.position.clone()
             }
         },
+        onMouseWheel:function(event,delta){
+            // this.onMouseClick(event);
+            event.preventDefault();
+            if(delta>0){
+                cameraDistance -= 2;
+                if(cameraDistance < 10)cameraDistance = 10;
+            }else{                                                      
+                cameraDistance += 2;
+                if(cameraDistance > 150)cameraDistance = 150;     
+            }
+        }
+        ,
+        onKeyDown:function(e){
+            //left
+            if (e.keyCode === 37) {
+                cameraRotations.y -= 2;
+            //right
+            }else if (e.keyCode === 39) {
+                cameraRotations.y += 2;
+            //up
+            }else if (e.keyCode === 38) {
+               
+                cameraRotations.x += 2;
+                if(cameraRotations.x > 80)cameraRotations.x =80;
+            //down
+            }else if (e.keyCode === 40) {
+                cameraRotations.x -= 2;
+                if(cameraRotations.x < -80)cameraRotations.x = -80;
+            //add
+            }else if (e.keyCode === 107) {
+                cameraDistance -= 2;
+                if(cameraDistance < 10)cameraDistance = 10;
+       
+            //subtract
+            }else if (e.keyCode === 109) {
+                cameraDistance += 2;
+                if(cameraDistance > 150)cameraDistance = 150;
+            }
+        },
+        onKeyUp:function(e){
+            
+        },
         //use it like "eventname":"functionname"
         events: {
-            "click":"onMouseClick"
+            'keydown': 'onKeyDown',
+            'keyup': 'onKeyUp',
+            "click":"onMouseClick",
+            'mousewheel': 'onMouseWheel'
         },
         //event distribution
         _event:function(event,delta){

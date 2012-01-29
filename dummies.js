@@ -16,7 +16,7 @@ systemData = {
             name: "mooon1",
             type: "barren",
             orbit:0,
-            map: "barren2"
+            map: "barren1"
         }
         ]
     },

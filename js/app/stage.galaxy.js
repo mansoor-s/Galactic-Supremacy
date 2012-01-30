@@ -33,13 +33,17 @@ App.Stages.Galaxy = (function() {
     var filmPass = new THREE.BloomPass(2.5, 25, 4.0);
     var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
     effectScreen.renderToScreen = true;
-	
-    //this is where the camea will look at when free camera is enable
-    //ivankuzev:i am making it object3d so i can use all of its functions
-    //rotations and scale too
-    var cameraRig;
+
+    //matrix used for rotating things(any things)
+    var rotationMatrix = new THREE.Matrix4();
 
     return {
+        //camera controls ,,,have to be public for the transition between 
+        //galaxy and system view
+        cameraLookTarget:new THREE.Vector3(0,0,0),
+        cameraDistance:12000,
+        cameraRotations:new THREE.Vector3(45,0,0),
+        
         initialize:function (webgl) {
             controller = webgl;
             //get list of stars from the generator function(for now)
@@ -47,17 +51,9 @@ App.Stages.Galaxy = (function() {
             
             // Initialize camera
             camera = new THREE.PerspectiveCamera( 90, controller.jqDiv.width() / controller.jqDiv.height(), 1, 30000 );
-            camera.position= {
-                x: 0, 
-                y: 0, 
-                z: farestCameraPosition
-            };  
+            
             camera.matrixAutoUpdate = true;
-
-            cameraRig = new THREE.Object3D();
-            cameraRig.eulerOrder = "ZYX";
-            cameraRig.add(camera);
-            cameraRig.matrixAutoUpdate = true;
+            
             // Create scene
             scene = new THREE.Scene();
 
@@ -87,8 +83,8 @@ App.Stages.Galaxy = (function() {
                 map: THREE.ImageUtils.loadTexture( "images/sprite2.png" ),
                 vertexColors: true,
                 //blending:THREE.AdditiveBlending,
-   //             depthTest:false,
-				alphaTest: .5
+                //             depthTest:false,
+                alphaTest: .5
             } );
 
             //declare particle system with material 0
@@ -97,7 +93,6 @@ App.Stages.Galaxy = (function() {
 
 
             //add it to the scenes
-            scene.add(cameraRig);
             scene.add( particleSystem );
             //initialize postprocessing
 
@@ -108,6 +103,22 @@ App.Stages.Galaxy = (function() {
         },
 
         update: function(){
+            //updating camera position depending on controlls
+            var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
+            rotationMatrix.setRotationX(controller.degreesToRadians(this.cameraRotations.x));
+            distanceVector = rotationMatrix.multiplyVector3(distanceVector);
+            rotationMatrix.setRotationY(controller.degreesToRadians(this.cameraRotations.y));
+            distanceVector = rotationMatrix.multiplyVector3(distanceVector);
+            
+            camera.position.x = this.cameraLookTarget.x;
+            camera.position.y = this.cameraLookTarget.y;
+            camera.position.z = this.cameraLookTarget.z;
+       
+            camera.position.addSelf(distanceVector);
+            
+            camera.lookAt(this.cameraLookTarget);
+            
+            
             TWEEN.update();
         },
 
@@ -127,7 +138,7 @@ App.Stages.Galaxy = (function() {
             controller.renderer.clear();
             composer.render(0.05);
          
-         //   controller.renderer.render(scene,camera);
+        //   controller.renderer.render(scene,camera);
 
         },
 
@@ -136,31 +147,25 @@ App.Stages.Galaxy = (function() {
                 ctrMouse.initX = currentMouse.x;
                 ctrMouse.initY = currentMouse.y;
                 ctrPressed = true;
-                console.debug(cameraRig);
+
             //left
             }else if (e.keyCode === 37) {
-                cameraRig.rotation.y -= controller.degreesToRadians(1);
+                this.cameraRotations.y -= 1
             //right
             }else if (e.keyCode === 39) {
-                cameraRig.rotation.y += controller.degreesToRadians(1);
+                this.cameraRotations.y += 1
             //up
             }else if (e.keyCode === 38) {
-                cameraRig.rotation.x -= controller.degreesToRadians(1);
+                this.cameraRotations.x -= 1
             //down
             }else if (e.keyCode === 40) {
-                cameraRig.rotation.x += controller.degreesToRadians(1);
+                this.cameraRotations.x += 1
             //add
             }else if (e.keyCode === 107) {
-                //this zooming doesnt work..for now
-                cameraRig.scale.x+=0.1;
-                cameraRig.scale.y+=0.1;
-                cameraRig.scale.z+=0.1;
-
+                this.cameraDistance -=1;
             //subtract
             }else if (e.keyCode === 109) {
-                cameraRig.scale.x-=0.1;
-                cameraRig.scale.y-=0.1;
-                cameraRig.scale.z-=0.1;
+                this.cameraDistance +=1;
             }
 
         },
@@ -247,7 +252,7 @@ App.Stages.Galaxy = (function() {
                 
             }         
      
-            new TWEEN.Tween( cameraRig.position )
+            new TWEEN.Tween( this.cameraLookTarget )
             .to({
                 x: position.x,
                 y: position.y,

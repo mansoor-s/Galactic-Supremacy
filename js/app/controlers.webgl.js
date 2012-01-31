@@ -27,7 +27,9 @@ App.Controllers.webgl = (function() {
             this.projector = new THREE.Projector();
 
             // Create renderer
-            this.renderer = new THREE.WebGLRenderer({antialias:true} );
+            this.renderer = new THREE.WebGLRenderer({
+                antialias:true
+            } );
             this.renderer.setClearColor( 0xff0000, 1 );
             this.renderer.autoClear = false;
             this.renderer.setSize( this.jqDiv.width(), this.jqDiv.height() );

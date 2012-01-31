@@ -42,7 +42,7 @@ App.Controllers.webgl = (function() {
             this.jqDiv.append(this.renderer.domElement);
 
             //render the current stage
-            currentStage = App.Stages.StarSystem;
+            currentStage = App.Stages.Galaxy;
             currentStage.initialize(this);
             //event binding
 
@@ -93,25 +93,19 @@ App.Controllers.webgl = (function() {
 
         },
         //gets position in the z plane of a givvent mouse coordinates
-        getWorldXYZ:function(camera,xyPosition,z){
+        getIntersectionWithY:function(camera,xyPosition,y){
 
-            var mousex = ( xyPosition.x / this.jqDiv.width() ) * 2 - 1;
-            var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 - 1;
-          
-            var vector = new THREE.Vector3( -mousex, mousey, -1 );
-
-            this.projector.unprojectVector( vector, camera );
-                        
-            var origin = camera.matrixWorld.getPosition();
+           var mousex = ( xyPosition.x / this.jqDiv.width()) * 2 - 1;
+           var mousey = - ( xyPosition.y / this.jqDiv.height()) * 2 + 1;
             
-
-            vector =  vector.subSelf( origin ).normalize();
-            
-            var scalar =(origin.z - z  )/vector.z;   
-
+            var origin = camera.position;
+            var vector =  this.projector.unprojectVector(new THREE.Vector3(mousex,mousey,1), camera);
+           
+           var y_plane_point = y;
+vector.subSelf(origin).normalize();
+            var scalar =(y_plane_point - origin.y) / vector.y
             var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
- 
-            intersection.z = z;
+
             return intersection;
         },
         //helpful functions

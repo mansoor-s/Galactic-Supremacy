@@ -78,8 +78,8 @@ function createStars() {
 				
             stars.push({
                 x: left,
-                y: top,
-                z: depth,
+                y: depth,
+                z: top,
                 type: starType()
             });
                 
@@ -262,8 +262,8 @@ function createDust() {
 				
             dusts.push({
                 x: left,
-                y: top,
-                z: depth,
+                y: depth,
+                z: top,
                 type: starType()
             });
                 

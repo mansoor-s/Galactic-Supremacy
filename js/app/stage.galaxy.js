@@ -4,7 +4,7 @@ App.Stages.Galaxy = (function() {
     var scene;
     var materials= [];
     var starlist;
-    var farestCameraPosition = 12000;
+    var farestCameraPosition = 40000;
     var nearestCameraPosition = 200;
     //the levels of zoom
     var zoomLevelCurrent = 0;//
@@ -41,7 +41,7 @@ App.Stages.Galaxy = (function() {
         //camera controls ,,,have to be public for the transition between 
         //galaxy and system view
         cameraLookTarget:new THREE.Vector3(0,0,0),
-        cameraDistance:12000,
+        cameraDistance:40000,
         cameraRotations:new THREE.Vector3(45,0,0),
         
         initialize:function (webgl) {
@@ -50,7 +50,7 @@ App.Stages.Galaxy = (function() {
             starlist = createStars();
             
             // Initialize camera
-            camera = new THREE.PerspectiveCamera( 90, controller.jqDiv.width() / controller.jqDiv.height(), 1, 30000 );
+            camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 60000 );
             
             camera.matrixAutoUpdate = true;
             
@@ -73,7 +73,8 @@ App.Stages.Galaxy = (function() {
             // create geometry for the particle system  and add vertices to it
             galaxyGeometry = new THREE.Geometry();
             for ( i = 0; i < starlist.length; i ++ ) {
-                var vector = new THREE.Vector3( starlist[i].x, starlist[i].y, starlist[i].z );
+                //todo :  
+                var vector = new THREE.Vector3( starlist[i].x,starlist[i].y,starlist[i].z);
                 galaxyGeometry.vertices.push( new THREE.Vertex( vector ) );
                 galaxyGeometry.colors[i] = new THREE.Color( starColors[starlist[i].type] );
             }
@@ -162,10 +163,10 @@ App.Stages.Galaxy = (function() {
                 this.cameraRotations.x += 1
             //add
             }else if (e.keyCode === 107) {
-                this.cameraDistance -=1;
+                this.cameraDistance -=100;
             //subtract
             }else if (e.keyCode === 109) {
-                this.cameraDistance +=1;
+                this.cameraDistance +=100;
             }
 
         },
@@ -176,21 +177,7 @@ App.Stages.Galaxy = (function() {
             }
         },
 
-        zoomIn: function(xy){
-            if (zoomLevelCurrent === zoomLevelCount) {
-                return;
-            }
-            zoomLevelCurrent++;
-
-            //animate camera to new position 
-            new TWEEN.Tween( camera.position )
-            .to({
-                z: (1 / zoomLevelCurrent) * 6000  - 100
-            }, 500 )
-            .start()
-
-            this.centerOn(xy) 
-        },
+      
         getClosestStar:function(xy){
             xy.x = ( xy.x / controller.jqDiv.width() ) * 2 - 1;
             xy.y =  -( xy.y / controller.jqDiv.height()) * 2 + 1;
@@ -214,6 +201,21 @@ App.Stages.Galaxy = (function() {
             }
             return target;
         },
+          zoomIn: function(xy){
+            if (zoomLevelCurrent === zoomLevelCount) {
+                return;
+            }
+            zoomLevelCurrent++;
+
+            //animate camera to new position 
+            new TWEEN.Tween( this )
+            .to({
+                cameraPosition: (1 / zoomLevelCurrent) * 6000  - 100
+            }, 500 )
+            .start()
+
+            this.centerOn(xy) 
+        },
         zoomOut: function(xy){
             var levelOne = false
             //change the current zoom level
@@ -224,9 +226,9 @@ App.Stages.Galaxy = (function() {
             }
             zoomLevelCurrent--;
 
-            new TWEEN.Tween(  camera.position  )
+            new TWEEN.Tween( this )
             .to({     
-                z: !levelOne ? (1 / zoomLevelCurrent) * 6000 - 100: farestCameraPosition
+                cameraPosition: !levelOne ? (1 / zoomLevelCurrent) * 6000 - 100: farestCameraPosition
             }, 500 )
             .start()
 
@@ -245,8 +247,7 @@ App.Stages.Galaxy = (function() {
                 };
             } else {
                 //method 1:look for intersection with z plane
-                var z = 0;
-                position = controller.getWorldXYZ(camera,mousePosition,z);
+                position = controller.getIntersectionWithY(camera,mousePosition,0);
             //method 2:look for closest star to cursor
             // position = this.getClosestStar(mousePosition);
                 

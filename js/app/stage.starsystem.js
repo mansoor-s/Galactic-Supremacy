@@ -41,7 +41,7 @@ App.Stages.StarSystem = (function() {
         },
         _initializeGeometry:function(){
             meshes['sphere'] = new THREE.SphereGeometry( 1, 64, 32 );
-            meshes['torus'] = new THREE.TorusGeometry(1.2, 0.1, 2, 60)
+            meshes['torus'] = new THREE.TorusGeometry(1.2, 0.1, 2, 64)
             shapes['circle'] = new THREE.Shape();
             shapes['circle'].moveTo(0,0);
             shapes['circle'].arc( 0, 0, 1, 0, Math.PI*2, false );
@@ -171,7 +171,7 @@ App.Stages.StarSystem = (function() {
                     parent:scene
                 }
                 scene.add( planet );
-                var grid  = new THREE.Line( shapes['circle'].createPointsGeometry(60),materials['grid'])
+                var grid  = new THREE.Line( shapes['circle'].createPointsGeometry(64),materials['grid'])
                 grid.rotation.x = controller.degreesToRadians(90);
                 grid.scale.multiplyScalar(data.planets[i].distance)
          
@@ -197,7 +197,7 @@ App.Stages.StarSystem = (function() {
                         parent:planet
                     }
                     scene.add( moon );
-                    grid  = new THREE.Line( shapes['circle'].createPointsGeometry(60),materials['grid'])
+                    grid  = new THREE.Line( shapes['circle'].createPointsGeometry(64),materials['grid'])
                     grid.rotation.x = controller.degreesToRadians(90);
                     //distance from planet
                     grid.scale.multiplyScalar(i2+1+data.planets[i].size)

@@ -41,9 +41,10 @@ App.Controllers.webgl = (function() {
             this.jqDiv.append(stats.domElement);
             this.jqDiv.append(this.renderer.domElement);
 
-            //render the current stage
+            //initialize all stages
+            App.Stages.StarSystem.initialize(this)
+            App.Stages.Galaxy.initialize(this)
             currentStage = App.Stages.Galaxy;
-            currentStage.initialize(this);
             //event binding
 
             this.jqDiv.on('mousedown mouseup mousemove dblclick click mousewheel', this._event);
@@ -52,7 +53,15 @@ App.Controllers.webgl = (function() {
             this.animate();
         },
 
-
+        switchStages:function(arguments){
+            if (arguments.act === 'GalaxyToStar'){
+                currentStage = App.Stages.StarSystem;
+                currentStage.showSystem(arguments.data);
+                App.Stages.Galaxy.cameraDistance = 10;
+             App.Stages.StarSystem.cameraRotations = App.Stages.Galaxy.cameraRotations;
+                
+            }
+        },
         /*
         function animate
         Game loop - requests each new frame
@@ -95,14 +104,11 @@ App.Controllers.webgl = (function() {
         //gets position in the z plane of a givvent mouse coordinates
         getIntersectionWithY:function(camera,xyPosition,y){
 
-           var mousex = ( xyPosition.x / this.jqDiv.width()) * 2 - 1;
-           var mousey = - ( xyPosition.y / this.jqDiv.height()) * 2 + 1;
-            
             var origin = camera.position;
-            var vector =  this.projector.unprojectVector(new THREE.Vector3(mousex,mousey,1), camera);
+            var vector =  this.projector.unprojectVector(new THREE.Vector3(xyPosition.x,xyPosition.y,1), camera);
            
-           var y_plane_point = y;
-vector.subSelf(origin).normalize();
+            var y_plane_point = y;
+            vector.subSelf(origin).normalize();
             var scalar =(y_plane_point - origin.y) / vector.y
             var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
 

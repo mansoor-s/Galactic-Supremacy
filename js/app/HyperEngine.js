@@ -80,6 +80,7 @@ function createStars() {
                 x: left,
                 y: depth,
                 z: top,
+                name: 'x'+ left + 'y' + depth + 'z' + top,
                 type: starType()
             });
                 

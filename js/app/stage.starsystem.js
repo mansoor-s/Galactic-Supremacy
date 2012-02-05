@@ -5,8 +5,13 @@ App.Stages.StarSystem = (function() {
     var materials = {};
     var meshes = {};
     var shapes = {};
-    //keeps the intersected object for now
+    //mouse coordinates...updates on mousemove
+    var currentMouse = {
+        x: 0, 
+        y: 0
+    };
     var torus,torus2;
+    //keeps the intersected object for now
     var SELECTED;
     var rotationMatrix = new THREE.Matrix4();
      
@@ -21,7 +26,7 @@ App.Stages.StarSystem = (function() {
             controller = webgl;
             
             // Initialize camera
-            camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 200 );
+            camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 3000 );
           
             camera.matrixAutoUpdate = true;
                 
@@ -37,7 +42,6 @@ App.Stages.StarSystem = (function() {
             this._initializeLights();
             this._initializeMaterials();
             this._initializeGeometry();
-            this.showSystem(systemData);
         },
         _initializeGeometry:function(){
             meshes['sphere'] = new THREE.SphereGeometry( 1, 64, 32 );
@@ -67,7 +71,7 @@ App.Stages.StarSystem = (function() {
             materials['star'] = new THREE.MeshLambertMaterial(
             {
                 ambient:0xbbbbbb,
-              //  color: 0x888888,
+                //  color: 0x888888,
                 map: THREE.ImageUtils.loadTexture( 'images/textures/sun1.png')
   
             });
@@ -212,7 +216,12 @@ App.Stages.StarSystem = (function() {
              
             }
             
-            
+            this.cameraDistance = 2500
+            new TWEEN.Tween( this )
+            .to({
+                cameraDistance:100
+            }, 3000 )
+            .start()
         },
         //update the animation
         update: function(){
@@ -240,9 +249,14 @@ App.Stages.StarSystem = (function() {
             //postprocessing render 
             //   controller.renderer.clear();
             //   composer.render(0.05);
-            controller.renderer.clear();
-            controller.renderer.render(scene,camera);
-
+            App.Stages.Galaxy.cameraRotations = this.cameraRotations;
+            App.Stages.Galaxy.update();
+         //   controller.renderer.clear();
+          App.Stages.Galaxy.render();
+          
+          controller.renderer.render(scene,camera);
+            
+            
         },
         onMouseClick:function(event){
             var  mouse={};
@@ -317,12 +331,17 @@ App.Stages.StarSystem = (function() {
         onKeyUp:function(e){
             
         },
+        onMouseMove: function(event) {
+            currentMouse.x = (event.offsetX / controller.jqDiv.width()) * 2 - 1;
+            currentMouse.y = -(event.offsetY / controller.jqDiv.height()) * 2 + 1;
+        },
         //use it like "eventname":"functionname"
         events: {
             'keydown': 'onKeyDown',
             'keyup': 'onKeyUp',
             "click":"onMouseClick",
-            'mousewheel': 'onMouseWheel'
+            'mousewheel': 'onMouseWheel',
+            'mousemove': 'onMouseMove'
         },
         //event distribution
         _event:function(event,delta){

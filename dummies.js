@@ -1,4 +1,4 @@
-systemData = {
+dummyData = {
     star: {
         type: "g",
         size: 1.9

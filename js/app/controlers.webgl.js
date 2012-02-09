@@ -42,7 +42,7 @@ App.Controllers.webgl = (function() {
             this.jqDiv.append(this.renderer.domElement);
 
             //render the current stage
-            currentStage = App.Stages.StarSystem;
+            currentStage = App.Stages.Galaxy;
             currentStage.initialize(this);
             //event binding
 

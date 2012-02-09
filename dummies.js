@@ -1,16 +1,16 @@
 systemData = {
     star: {
         type: "g",
-        size: 1.9
+        size: 10
     },
     planets: [
     {
         name: "SOL1",
         type: "terran",
-        distance: 5,
+        distance: 30,
         size: 1.5,
         map: "terran1",
-        orbit:0.1,
+        orbit: 0.5,
         moons: [
         {
             name: "mooon1",
@@ -23,7 +23,7 @@ systemData = {
     {
         name: "SOL2",
         type: "volcanic",
-        distance: 10,
+        distance: 20,
         size: 0.8,
         map: "volcanic3",
         orbit:0.5,
@@ -34,10 +34,10 @@ systemData = {
     {
         name: "SOL1",
         type: "gasgiant",
-        distance: 20,
+        distance: 45,
         size: 4.5,
         map: "gass5",
-        orbit:0.8,
+        orbit:30,
         moons: [
         {
             name: "mooon1",

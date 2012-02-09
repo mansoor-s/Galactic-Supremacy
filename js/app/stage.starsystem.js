@@ -6,7 +6,7 @@ App.Stages.StarSystem = (function() {
     var meshes = {};
     var shapes = {};
     //keeps the intersected object for now
-    var torus,torus2;
+    var selector;
     var SELECTED;
     var rotationMatrix = new THREE.Matrix4();
      
@@ -49,76 +49,60 @@ App.Stages.StarSystem = (function() {
         _initializeMaterials:function(){
             //initialized all materials
             //todo:add also textured materials
-          
-            materials['torus'] = new THREE.MeshLambertMaterial( {
-                ambient:0x008888,
-                color: 0x00ffff
-            } ); 
-            materials['grid'] =  new THREE.LineBasicMaterial( {
-                color: 0x293A45, 
-                opacity: 0.9, 
-                smooth:true // not sure if there is even smooth
-            } );
-
-            materials['wireframe'] = new THREE.MeshBasicMaterial( {
-                color: 0x293A45, 
-                wireframe: true
-            } );
-            materials['star'] = new THREE.MeshLambertMaterial(
-            {
-                ambient:0xbbbbbb,
-              //  color: 0x888888,
-                map: THREE.ImageUtils.loadTexture( 'images/textures/sun1.png')
-  
-            });
-           
-            materials['desert'] = new THREE.MeshLambertMaterial(
-            {
-                ambient: 0x555555,
-                color: 0x888888,
-                map: THREE.ImageUtils.loadTexture( 'images/textures/desert1.jpg')
-  
-            });
-            materials['volcanic'] = new THREE.MeshLambertMaterial(
-            {
-                color: 0x880000,
-                ambient: 0x550000
-            });
-            materials['gasgiant'] = new THREE.MeshLambertMaterial(
-            {
-                ambient: 0x005500,
-                color: 0x008800
-            });
-          
-            materials['barren'] = new THREE.MeshLambertMaterial(
-            {
-                ambient: 0x555555,
-                color: 0x888888,
-                map: THREE.ImageUtils.loadTexture( 'images/textures/barren1.jpg')
-      
-            });
-            materials['terran'] = new THREE.MeshLambertMaterial(
-            {
-                ambient: 0x555555,
-                color: 0x888888,
-                map: THREE.ImageUtils.loadTexture( 'images/textures/terran1.jpg')
-    
-            });
-            materials['ice'] = new THREE.MeshLambertMaterial(
-            {
-                ambient: 0x05555,
-                color: 0x008888
-            });
+            var t = new Terrains();
+            t.init();
+            materials = t._array;
         },
         _initializeLights:function(){
             scene.add( new THREE.AmbientLight( 0xffffff ) );
 
             // create a point light
-            scene.add( new THREE.PointLight( 0xFFFFFF ,1));
+            scene.add( new THREE.PointLight( 0xFFFFFF ,2));
         },
+        
+        addSpace : function() {
+
+				var geometry = new THREE.Geometry();
+
+				var sprite1 = THREE.ImageUtils.loadTexture( "images/textures/star_particle.png" );
+				var sprite2 = THREE.ImageUtils.loadTexture( "images/textures/red_star_particle.png" );
+				var sprite3 = THREE.ImageUtils.loadTexture( "images/textures/blue_star_particle.png" );
+				var sprite4 = THREE.ImageUtils.loadTexture( "images/textures/star_particle.png" );
+				var sprite5 = THREE.ImageUtils.loadTexture( "images/textures/star_particle.png" );
+                var vector, color, sprite, size, particles, materials={};
+				for ( i = 0; i < 10000; i ++ ) {
+					vector = new THREE.Vector3( Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, Math.random() * 2000 - 1000 );
+					geometry.vertices.push( new THREE.Vertex( vector ) );
+				}
+
+				var parameters = [ [ [4, 0.2, 5], sprite2, 1 ],
+							   [ [5, 0.1, 5], sprite3, 1 ],
+							   [ [6, 0.05, 5], sprite1, 0.6 ],
+							   [ [7, 0, 5], sprite5,2 ],
+							   [ [10, 0, 10], sprite4,1 ],
+							   ];
+
+				for ( i = 0; i < parameters.length; i ++ ) {
+
+					color  = parameters[i][0];
+					sprite = parameters[i][1];
+					size   = parameters[i][2];
+
+					materials[i] = new THREE.ParticleBasicMaterial( { size: size, map: sprite, depthTest: false, transparent : true } );
+					materials[i].color.setHSV( color[0], color[1], color[2] );
+
+					particles = new THREE.ParticleSystem( geometry, materials[i] );
+                    particles.rotation.x = Math.random() * 8 + 12;
+					particles.rotation.y = Math.random() * 8 + 12;
+					particles.rotation.z = Math.random() * 8 + 12;
+                    scene.add(particles);
+                    }
+        },
+        
         //shows differend system depending on the data given
         showSystem: function(data){
             //adding torus
+            /*
             torus = new THREE.Mesh(meshes['torus'],materials['torus']);
             torus2 = new THREE.Mesh(meshes['torus'],materials['torus']);
             torus.rotation.x = controller.degreesToRadians(90);
@@ -128,6 +112,7 @@ App.Stages.StarSystem = (function() {
                 object:'torus', 
                 parent:scene
             }
+
             torus2.tag =  torus.tag;
             
             scene.add(torus);
@@ -143,12 +128,18 @@ App.Stages.StarSystem = (function() {
                 ta.start();
             })
             .start()      
-                    
+            */  
+          
+            scene.fog = new THREE.FogExp2( 0x000000, 0.000008 );
             //adding solar objects
-            var star = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['star'] );
+            var star = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['main_sequence'] );
+            var horizon = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['horizon'] );
+            selector = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['selector'] );
+            scene.add(selector);
             //since default size of the meshes is 1 ..we just multiply
             //it by the size of the object
-            star.scale.multiplyScalar(data.star.size)
+            star.scale.multiplyScalar(data.star.size);
+            horizon.scale.multiplyScalar(data.star.size+0.4);
             //adding some meta data to keep track of the object more easily
             star.tag = {
                 object:'star',
@@ -156,6 +147,8 @@ App.Stages.StarSystem = (function() {
                 parent:scene
             }
             scene.add( star );
+            scene.add( horizon );
+            this.addSpace();
             //matrix that will rotate the vectors
             for(var i = 0;i<data.planets.length;i++){
                 var planet = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials[data.planets[i].type] );
@@ -183,7 +176,7 @@ App.Stages.StarSystem = (function() {
                 scene.add(grid);
                 for(var i2 = 0;i2<data.planets[i].moons.length;i2++){
                     var moon = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials[data.planets[i].moons[i2].type] );
-                    moon.scale.multiplyScalar(0.5);
+                    moon.scale.multiplyScalar(0.2);
                     //set distance(from planet)
                     moon.position.set(1,0,0).multiplyScalar(i2+1+data.planets[i].size);
                     //rotate
@@ -214,6 +207,7 @@ App.Stages.StarSystem = (function() {
             
             
         },
+        
         //update the animation
         update: function(){
            
@@ -260,8 +254,14 @@ App.Stages.StarSystem = (function() {
             if ( intersects.length > 0 ) {
                 if ( SELECTED != intersects[ 0 ].object ) {
 
-                    torus.position=intersects[ 0 ].object.position.clone();
-                    torus.scale = intersects[ 0 ].object.scale.clone();
+                    selector.position=intersects[ 0 ].object.position.clone();
+                    var size = new THREE.Vector3;
+                    size = intersects[ 0 ].object.scale.clone();
+                    size.x += 0.1;
+                    size.y += 0.1;
+                    size.z += 0.1;
+                    selector.scale = size;
+                    //console.log( intersects[ 0 ].object.scale.clone().scale.multiplyScalar(1));
                     SELECTED = intersects[ 0 ].object;
                     
                     new TWEEN.Tween( this.cameraLookTarget )
@@ -272,7 +272,7 @@ App.Stages.StarSystem = (function() {
 
             } else {
                 SELECTED = null;
-                torus.position = scene.position.clone()
+                selector.position = scene.position.clone()
             }
         },
         onMouseWheel:function(event,delta){

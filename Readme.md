@@ -23,6 +23,14 @@ Players start out on a single planet, from which they must build infrastructure 
 Space battles take place in a fully 3D environment, where ships can be moved in X, Y, and Z axes (think Homeworld). This introduces many new factors to take into acount when planning a move.
 
 
+##Demo
+Some very early work in progress demos:
+Galaxy view
+http://mansoorsayed.com/gs2/
+Starsystem view
+http://mansoorsayed.com/gs/
+
+
 ##TODO:
 More documentation
 

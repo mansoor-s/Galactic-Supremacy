@@ -5,27 +5,40 @@ App.Stages.StarSystem = (function() {
     var materials = {};
     var meshes = {};
     var shapes = {};
+    var farestCameraPosition = 5000;
+    var zoomLevelCurrent = 10;
+    //flag for when the CTRL key is pressed
+    var ctrPressed = false;
+    //holds the coordinates for moving the camera when free camera is enabled
+    var ctrMouse = {
+        x: 0,
+        y: 0,
+        initX: 0,
+        initY: 0
+    };
     //keeps the intersected object for now
     var selector;
     var SELECTED;
     var rotationMatrix = new THREE.Matrix4();
-     
+    var cameraRotations;
+    var cameraLookTarget;
     return {
+        cameraDistance: 1000,
         //camera controls ,,,have to be public for the transition between 
         //galaxy and system view
-        cameraLookTarget:new THREE.Vector3(0,0,0),
-        cameraDistance:70,
-        cameraRotations:new THREE.Vector3(45,0,0),
        
         initialize:function (webgl) {
             controller = webgl;
             
             // Initialize camera
-            camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 200 );
+            camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 999999 );
           
             camera.matrixAutoUpdate = true;
-                
-          
+            
+            cameraLookTarget = new THREE.Vector3(0,0,0),
+            cameraDistance = 1000;
+            cameraRotations = new THREE.Vector3(45,0,0);
+
             // Create scene
             scene = new THREE.Scene();
 
@@ -40,11 +53,11 @@ App.Stages.StarSystem = (function() {
             this.showSystem(systemData);
         },
         _initializeGeometry:function(){
-            meshes['sphere'] = new THREE.SphereGeometry( 1, 64, 32 );
+            meshes['sphere'] = new THREE.SphereGeometry( 1, 64, 62 );
             meshes['torus'] = new THREE.TorusGeometry(1.2, 0.1, 2, 60)
             shapes['circle'] = new THREE.Shape();
             shapes['circle'].moveTo(0,0);
-            shapes['circle'].arc( 0, 0, 1, 0, Math.PI*2, false );
+            shapes['circle'].arc( 0, 0, 1, 0, Math.PI * 2, false );
         },
         _initializeMaterials:function(){
             //initialized all materials
@@ -57,7 +70,7 @@ App.Stages.StarSystem = (function() {
             scene.add( new THREE.AmbientLight( 0xffffff ) );
 
             // create a point light
-            scene.add( new THREE.PointLight( 0xFFFFFF ,2));
+            scene.add( new THREE.PointLight( 0xFFFFFF , 3));
         },
         
         addSpace : function() {
@@ -95,42 +108,13 @@ App.Stages.StarSystem = (function() {
                     particles.rotation.x = Math.random() * 8 + 12;
 					particles.rotation.y = Math.random() * 8 + 12;
 					particles.rotation.z = Math.random() * 8 + 12;
-                    scene.add(particles);
+                    //scene.add(particles);
                     }
         },
         
         //shows differend system depending on the data given
         showSystem: function(data){
-            //adding torus
-            /*
-            torus = new THREE.Mesh(meshes['torus'],materials['torus']);
-            torus2 = new THREE.Mesh(meshes['torus'],materials['torus']);
-            torus.rotation.x = controller.degreesToRadians(90);
-            torus2.rotation.x = controller.degreesToRadians(90);
-            torus.scale.multiplyScalar(data.star.size);
-            torus.tag={
-                object:'torus', 
-                parent:scene
-            }
-
-            torus2.tag =  torus.tag;
-            
-            scene.add(torus);
-            torus.add(torus2);
-                
-            //tests with the tourus  
-            ta = new TWEEN.Tween( torus.rotation )
-            .to({
-                x:controller.degreesToRadians(450)
-            }, 4000 )
-            .onComplete(function(){
-                torus.rotation.x = controller.degreesToRadians(90);
-                ta.start();
-            })
-            .start()      
-            */  
           
-            scene.fog = new THREE.FogExp2( 0x000000, 0.000008 );
             //adding solar objects
             var star = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['main_sequence'] );
             var horizon = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['horizon'] );
@@ -138,7 +122,7 @@ App.Stages.StarSystem = (function() {
             scene.add(selector);
             //since default size of the meshes is 1 ..we just multiply
             //it by the size of the object
-            star.scale.multiplyScalar(data.star.size);
+            star.scale.multiplyScalar(data.star.size * 30);
             horizon.scale.multiplyScalar(data.star.size+0.4);
             //adding some meta data to keep track of the object more easily
             star.tag = {
@@ -148,37 +132,37 @@ App.Stages.StarSystem = (function() {
             }
             scene.add( star );
             scene.add( horizon );
-            this.addSpace();
+            //this.addSpace();
             //matrix that will rotate the vectors
             for(var i = 0;i<data.planets.length;i++){
                 var planet = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials[data.planets[i].type] );
-                planet.scale.multiplyScalar(data.planets[i].size);
+                planet.scale.multiplyScalar(data.planets[i].size * 50);
                 //set the position.and then rotate it...
-                planet.position.set(1,0,0).multiplyScalar(data.planets[i].distance);
+                planet.position.set(1,0,0).multiplyScalar(data.planets[i].distance * 600 + 100);
                 rotationMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].orbit));
                 rotationMatrix.multiplyVector3(planet.position);
           
                 planet.tag = {
-                    object:'planet'+i,
+                    object:'planet' + i,
                     data:data.planets[i],
                     parent:scene
                 }
                 scene.add( planet );
                 var grid  = new THREE.Line( shapes['circle'].createPointsGeometry(60),materials['grid'])
                 grid.rotation.x = controller.degreesToRadians(90);
-                grid.scale.multiplyScalar(data.planets[i].distance)
+                grid.scale.multiplyScalar(data.planets[i].distance * 600 + 100)
          
                 grid.tag={
-                    object:'grid'+i, 
-                    parent:scene
+                    object: 'grid' + i, 
+                    parent: scene
                 }
            
                 scene.add(grid);
-                for(var i2 = 0;i2<data.planets[i].moons.length;i2++){
+                for(var i2 = 0; i2 < data.planets[i].moons.length; i2++){
                     var moon = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials[data.planets[i].moons[i2].type] );
-                    moon.scale.multiplyScalar(0.2);
+                    moon.scale.multiplyScalar(30);
                     //set distance(from planet)
-                    moon.position.set(1,0,0).multiplyScalar(i2+1+data.planets[i].size);
+                    moon.position.set(1,0,0).multiplyScalar((i2 * 200) + 400 + data.planets[i].size);
                     //rotate
                     rotationMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].moons[i2].orbit));
                     rotationMatrix.multiplyVector3(moon.position);
@@ -193,7 +177,7 @@ App.Stages.StarSystem = (function() {
                     grid  = new THREE.Line( shapes['circle'].createPointsGeometry(60),materials['grid'])
                     grid.rotation.x = controller.degreesToRadians(90);
                     //distance from planet
-                    grid.scale.multiplyScalar(i2+1+data.planets[i].size)
+                    grid.scale.multiplyScalar((i2 * 200) + 400 + data.planets[i].size)
                     grid.position = planet.position.clone();
                     grid.tag={
                         object:'grid'+i, 
@@ -213,18 +197,18 @@ App.Stages.StarSystem = (function() {
            
             //updating camera position depending on controlls
             var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
-            rotationMatrix.setRotationX(controller.degreesToRadians(this.cameraRotations.x));
+            rotationMatrix.setRotationX(controller.degreesToRadians(cameraRotations.x));
             distanceVector = rotationMatrix.multiplyVector3(distanceVector);
-            rotationMatrix.setRotationY(controller.degreesToRadians(this.cameraRotations.y));
+            rotationMatrix.setRotationY(controller.degreesToRadians(cameraRotations.y));
             distanceVector = rotationMatrix.multiplyVector3(distanceVector);
             
-            camera.position.x = this.cameraLookTarget.x;
-            camera.position.y = this.cameraLookTarget.y;
-            camera.position.z = this.cameraLookTarget.z;
+            camera.position.x = cameraLookTarget.x;
+            camera.position.y = cameraLookTarget.y;
+            camera.position.z = cameraLookTarget.z;
        
             camera.position.addSelf(distanceVector);
             
-            camera.lookAt(this.cameraLookTarget);
+            camera.lookAt(cameraLookTarget);
             
             TWEEN.update();
         },
@@ -275,48 +259,88 @@ App.Stages.StarSystem = (function() {
                 selector.position = scene.position.clone()
             }
         },
-        onMouseWheel:function(event,delta){
-            // this.onMouseClick(event);
-            event.preventDefault();
-            if(delta>0){
-                this.cameraDistance -= 2;
-                if(this.cameraDistance < 10)this.cameraDistance = 10;
-            }else{                                                      
-                this.cameraDistance += 2;
-                if(this.cameraDistance > 150)this.cameraDistance = 150;     
-            }
-        }
-        ,
+
+        zoomOut: function(xy){
+            new TWEEN.Tween( this  )
+            .to({
+                cameraDistance: this.cameraDistance + 200
+
+            }, 500 )
+            .start();
+
+            //this.centerOn(xy) 
+        },
+
+
+        zoomIn: function(xy){
+
+            //animate camera to new position 
+            new TWEEN.Tween( this )
+            .to({
+                cameraDistance: this.cameraDistance - 200
+            }, 500 )
+            .start()
+
+            //this.centerOn(xy) 
+        },
         onKeyDown:function(e){
             //left
-            if (e.keyCode === 37) {
-                this.cameraRotations.y -= 2;
+            if (e.keyCode === 17) {
+                ctrMouse.initX = currentMouse.x;
+                ctrMouse.initY = currentMouse.y;
+                ctrPressed = true;
+
+            //left
+            }else if (e.keyCode === 37) {
+                cameraRotations.y -= 2;
             //right
             }else if (e.keyCode === 39) {
-                this.cameraRotations.y += 2;
+                cameraRotations.y += 2;
             //up
             }else if (e.keyCode === 38) {
                
-                this.cameraRotations.x += 2;
-                if(this.cameraRotations.x > 80)this.cameraRotations.x =80;
+                cameraRotations.x += 2;
+                if(cameraRotations.x > 80)cameraRotations.x =80;
             //down
             }else if (e.keyCode === 40) {
-                this.cameraRotations.x -= 2;
-                if(this.cameraRotations.x < -80)this.cameraRotations.x = -80;
+                cameraRotations.x -= 2;
+                if(cameraRotations.x < -80)cameraRotations.x = -80;
             //add
             }else if (e.keyCode === 107) {
-                this.cameraDistance -= 2;
-                if(this.cameraDistance < 10)this.cameraDistance = 10;
+                this.zoomIn();
        
             //subtract
             }else if (e.keyCode === 109) {
-                this.cameraDistance += 2;
-                if(this.cameraDistance > 150)this.cameraDistance = 150;
+                this.zoomOut();
             }
         },
         onKeyUp:function(e){
             
         },
+
+        //mousewheel handler
+        onMouseWheel: function(event,delta){
+            event.preventDefault();
+
+            //if free camera mode is enabled do nothing because nasty thing will happen
+            if (ctrPressed) {
+                return;
+            }
+
+            var clickX= event.pageX - $(event.target).position().left;
+            var clickY= event.pageY - $(event.target).position().top;
+            var mouseXY = {
+                x:clickX,
+                y:clickY
+            };
+            if(delta>0){
+                this.zoomIn(mouseXY);
+            }else{                                                      
+                this.zoomOut(mouseXY);            
+            }
+
+        },
+
         //use it like "eventname":"functionname"
         events: {
             'keydown': 'onKeyDown',

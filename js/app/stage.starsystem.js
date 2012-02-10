@@ -260,51 +260,60 @@ App.Stages.StarSystem = (function() {
             }
         },
 
-        zoomOut: function(xy){
+        zoomOut: function(){
+        
+            var newDistance = this.cameraDistance + (Math.pow(this.cameraDistance, .9));
+
             new TWEEN.Tween( this  )
             .to({
-                cameraDistance: this.cameraDistance + 200
+                cameraDistance: newDistance
+
+            }, 500 )
+            .start();
+        },
+
+
+        zoomIn: function(){
+
+           var newDistance = this.cameraDistance - (Math.pow(this.cameraDistance, .9));
+
+            new TWEEN.Tween( this  )
+            .to({
+                cameraDistance: newDistance
 
             }, 500 )
             .start();
 
-            //this.centerOn(xy) 
-        },
-
-
-        zoomIn: function(xy){
-
-            //animate camera to new position 
-            new TWEEN.Tween( this )
-            .to({
-                cameraDistance: this.cameraDistance - 200
-            }, 500 )
-            .start()
-
-            //this.centerOn(xy) 
         },
         onKeyDown:function(e){
             //left
+            var yRot = cameraRotations.y, xRot = cameraRotations.x;
+            var turnUnits = 4;
             if (e.keyCode === 17) {
-                ctrMouse.initX = currentMouse.x;
-                ctrMouse.initY = currentMouse.y;
+                //ctrMouse.initX = currentMouse.x;
+                //ctrMouse.initY = currentMouse.y;
                 ctrPressed = true;
-
             //left
             }else if (e.keyCode === 37) {
-                cameraRotations.y -= 2;
+                yRot = cameraRotations.y - turnUnits;
             //right
             }else if (e.keyCode === 39) {
-                cameraRotations.y += 2;
+                yRot = cameraRotations.y + turnUnits;
             //up
             }else if (e.keyCode === 38) {
-               
-                cameraRotations.x += 2;
-                if(cameraRotations.x > 80)cameraRotations.x =80;
+                if(cameraRotations.x > 80) {
+                    xRot = 80;
+                } else {
+                    xRot = cameraRotations.x + turnUnits;
+                }
+
             //down
             }else if (e.keyCode === 40) {
-                cameraRotations.x -= 2;
-                if(cameraRotations.x < -80)cameraRotations.x = -80;
+                if(cameraRotations.x < -80) {
+                    xRot = -80;
+                } else {
+                    xRot = cameraRotations.x - turnUnits;
+                }
             //add
             }else if (e.keyCode === 107) {
                 this.zoomIn();
@@ -313,6 +322,13 @@ App.Stages.StarSystem = (function() {
             }else if (e.keyCode === 109) {
                 this.zoomOut();
             }
+            new TWEEN.Tween( cameraRotations  )
+            .to({
+                x: xRot,
+                y: yRot
+
+            }, 200 )
+            .start();
         },
         onKeyUp:function(e){
             

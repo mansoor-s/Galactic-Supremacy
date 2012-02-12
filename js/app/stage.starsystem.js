@@ -61,9 +61,10 @@ App.Stages.StarSystem = (function() {
                 var material = new THREE.MeshFaceMaterial();
 
                 var mesh = new THREE.Mesh( geometry, material );
-                mesh.position.addSelf({x: 700, y: 700, z: 0});
-
+                mesh.position.set( 20000, 20000, 10000);
+                console.log(mesh.position);
                 scene.addObject( mesh );
+                
             } } );
         },
         _initializeGeometry:function(){
@@ -135,6 +136,7 @@ App.Stages.StarSystem = (function() {
             var horizon = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['horizon'] );
             selector = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['selector'] );
             scene.add(selector);
+            selector.visible = false;
             //since default size of the meshes is 1 ..we just multiply
             //it by the size of the object
             star.scale.multiplyScalar(data.star.size * 30);
@@ -167,7 +169,7 @@ App.Stages.StarSystem = (function() {
                 grid.rotation.x = controller.degreesToRadians(90);
                 grid.scale.multiplyScalar(data.planets[i].distance * 600 + 100)
          
-                grid.tag={
+                grid.tag = {
                     object: 'grid' + i, 
                     parent: scene
                 }
@@ -261,7 +263,7 @@ App.Stages.StarSystem = (function() {
                     selector.scale = size;
                     //console.log( intersects[ 0 ].object.scale.clone().scale.multiplyScalar(1));
                     SELECTED = intersects[ 0 ].object;
-                    
+                    selector.visible =
                     new TWEEN.Tween( cameraLookTarget )
                     .to(intersects[ 0 ].object.position, 1500 )
                     .start()
@@ -270,7 +272,7 @@ App.Stages.StarSystem = (function() {
 
             } else {
                 SELECTED = null;
-                selector.size = {x: 0, y: 0, y: 0};
+                selector.visible = false;
                 selector.position = scene.position.clone()
             }
         },
@@ -342,7 +344,7 @@ App.Stages.StarSystem = (function() {
                 x: xRot,
                 y: yRot
 
-            }, 200 )
+            }, 50 )
             .start();
         },
         onKeyUp:function(e){

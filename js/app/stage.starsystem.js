@@ -41,7 +41,8 @@ App.Stages.StarSystem = (function() {
             // Create scene
             scene = new THREE.Scene();
 
-       
+            
+            
             //initialize postprocessing
             //renderModel = new THREE.RenderPass( scene, camera );
             //composer = new THREE.EffectComposer( controller.renderer );
@@ -50,6 +51,20 @@ App.Stages.StarSystem = (function() {
             this._initializeMaterials();
             this._initializeGeometry();
             this.showSystem(systemData);
+
+            var loader = new THREE.JSONLoader();
+            loader.load( { model: './models/Shipyard.js', callback: function(geometry ) {
+                console.log('loaded model');
+                //geometry.materials[0][0].shading = THREE.FlatShading;
+                //geometry.materials[0][0].morphTargets = true;
+
+                var material = new THREE.MeshFaceMaterial();
+
+                var mesh = new THREE.Mesh( geometry, material );
+                mesh.position.addSelf({x: 700, y: 700, z: 0});
+
+                scene.addObject( mesh );
+            } } );
         },
         _initializeGeometry:function(){
             meshes['sphere'] = new THREE.SphereGeometry( 1, 64, 62 );
@@ -73,7 +88,7 @@ App.Stages.StarSystem = (function() {
         },
         
         addSpace : function() {
-
+/*
 				var geometry = new THREE.Geometry();
 
 				var sprite1 = THREE.ImageUtils.loadTexture( "images/textures/star_particle.png" );
@@ -109,6 +124,7 @@ App.Stages.StarSystem = (function() {
 					particles.rotation.z = Math.random() * 8 + 12;
                     //scene.add(particles);
                     }
+                    */
         },
         
         //shows differend system depending on the data given
@@ -130,7 +146,7 @@ App.Stages.StarSystem = (function() {
                 parent:scene
             }
             scene.add( star );
-            scene.add( horizon );
+            //scene.add( horizon );
             //this.addSpace();
             //matrix that will rotate the vectors
             for(var i = 0;i<data.planets.length;i++){
@@ -221,7 +237,7 @@ App.Stages.StarSystem = (function() {
 
         },
         onMouseClick:function(event){
-            var  mouse={};
+            var  mouse = {};
             //not sure if this will aways pick the correct mouse cordinates
             mouse.x = ( event.clientX / controller.jqDiv.width()) * 2 - 1;
             mouse.y = - ( event.clientY / controller.jqDiv.height()) * 2 + 1;
@@ -236,7 +252,7 @@ App.Stages.StarSystem = (function() {
             if ( intersects.length > 0 ) {
                 if ( SELECTED != intersects[ 0 ].object ) {
 
-                    selector.position=intersects[ 0 ].object.position.clone();
+                    selector.position = intersects[ 0 ].object.position.clone();
                     var size = new THREE.Vector3;
                     size = intersects[ 0 ].object.scale.clone();
                     size.x += 0.1;
@@ -246,7 +262,7 @@ App.Stages.StarSystem = (function() {
                     //console.log( intersects[ 0 ].object.scale.clone().scale.multiplyScalar(1));
                     SELECTED = intersects[ 0 ].object;
                     
-                    new TWEEN.Tween( this.cameraLookTarget )
+                    new TWEEN.Tween( cameraLookTarget )
                     .to(intersects[ 0 ].object.position, 1500 )
                     .start()
                     
@@ -254,6 +270,7 @@ App.Stages.StarSystem = (function() {
 
             } else {
                 SELECTED = null;
+                selector.size = {x: 0, y: 0, y: 0};
                 selector.position = scene.position.clone()
             }
         },
@@ -359,7 +376,7 @@ App.Stages.StarSystem = (function() {
         events: {
             'keydown': 'onKeyDown',
             'keyup': 'onKeyUp',
-            "click":"onMouseClick",
+            "click": 'onMouseClick',
             'mousewheel': 'onMouseWheel'
         },
         //event distribution

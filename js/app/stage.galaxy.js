@@ -4,8 +4,9 @@ App.Stages.Galaxy = (function() {
     var scene;
     var materials= [];
     var starlist;
-    var farestCameraPosition = 12000;
+    var farestCameraPosition = 10000;
     var nearestCameraPosition = 200;
+    var cameraDistance = farestCameraPosition;
     //the levels of zoom
     var zoomLevelCurrent = 0;//
     var zoomLevelCount = 37; 
@@ -40,9 +41,9 @@ App.Stages.Galaxy = (function() {
     return {
         //camera controls ,,,have to be public for the transition between 
         //galaxy and system view
-        cameraLookTarget:new THREE.Vector3(0,0,0),
-        cameraDistance:12000,
-        cameraRotations:new THREE.Vector3(45,0,0),
+        cameraLookTarget:new THREE.Vector3(0, 0, 0),
+        
+        cameraRotations:new THREE.Vector3(0, 0, 0),
         
         initialize:function (webgl) {
             controller = webgl;
@@ -50,10 +51,11 @@ App.Stages.Galaxy = (function() {
             starlist = createStars();
             
             // Initialize camera
-            camera = new THREE.PerspectiveCamera( 90, controller.jqDiv.width() / controller.jqDiv.height(), 1, 30000 );
+            camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 90000 );
             
             camera.matrixAutoUpdate = true;
             
+            cameraDistance = farestCameraPosition;
             // Create scene
             scene = new THREE.Scene();
 
@@ -104,7 +106,7 @@ App.Stages.Galaxy = (function() {
 
         update: function(){
             //updating camera position depending on controlls
-            var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
+            var distanceVector = new THREE.Vector3(0,0,-cameraDistance);
             rotationMatrix.setRotationX(controller.degreesToRadians(this.cameraRotations.x));
             distanceVector = rotationMatrix.multiplyVector3(distanceVector);
             rotationMatrix.setRotationY(controller.degreesToRadians(this.cameraRotations.y));
@@ -136,7 +138,7 @@ App.Stages.Galaxy = (function() {
             }
             //postprocessing render
             controller.renderer.clear();
-            composer.render(0.05);
+            composer.render();
          
         //   controller.renderer.render(scene,camera);
 
@@ -176,21 +178,6 @@ App.Stages.Galaxy = (function() {
             }
         },
 
-        zoomIn: function(xy){
-            if (zoomLevelCurrent === zoomLevelCount) {
-                return;
-            }
-            zoomLevelCurrent++;
-
-            //animate camera to new position 
-            new TWEEN.Tween( camera.position )
-            .to({
-                z: (1 / zoomLevelCurrent) * 6000  - 100
-            }, 500 )
-            .start()
-
-            this.centerOn(xy) 
-        },
         getClosestStar:function(xy){
             xy.x = ( xy.x / controller.jqDiv.width() ) * 2 - 1;
             xy.y =  -( xy.y / controller.jqDiv.height()) * 2 + 1;
@@ -214,6 +201,23 @@ App.Stages.Galaxy = (function() {
             }
             return target;
         },
+
+        zoomIn: function(xy){
+            if (zoomLevelCurrent === zoomLevelCount) {
+                return;
+            }
+            zoomLevelCurrent++;
+
+            //animate camera to new position 
+            new TWEEN.Tween( camera.position )
+            .to({
+                cameraDistance: 1000
+            }, 500 )
+            .start()
+
+            //this.centerOn(xy) 
+        },
+        
         zoomOut: function(xy){
             var levelOne = false
             //change the current zoom level
@@ -224,13 +228,13 @@ App.Stages.Galaxy = (function() {
             }
             zoomLevelCurrent--;
 
-            new TWEEN.Tween(  camera.position  )
+            new TWEEN.Tween(  this  )
             .to({     
-                z: !levelOne ? (1 / zoomLevelCurrent) * 6000 - 100: farestCameraPosition
+                cameraDistance: 10000
             }, 500 )
             .start()
 
-            this.centerOn(xy) 
+            //this.centerOn(xy) 
         },
 
         //moves the stars so that position is at the center of the screen

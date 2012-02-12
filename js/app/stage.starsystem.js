@@ -23,7 +23,7 @@ App.Stages.StarSystem = (function() {
     var cameraRotations;
     var cameraLookTarget;
     return {
-        cameraDistance: 1000,
+        cameraDistance: 2000,
         //camera controls ,,,have to be public for the transition between 
         //galaxy and system view
        
@@ -35,8 +35,7 @@ App.Stages.StarSystem = (function() {
           
             camera.matrixAutoUpdate = true;
             
-            cameraLookTarget = new THREE.Vector3(0,0,0),
-            cameraDistance = 1000;
+            cameraLookTarget = new THREE.Vector3(0,0,0);
             cameraRotations = new THREE.Vector3(45,0,0);
 
             // Create scene
@@ -123,7 +122,7 @@ App.Stages.StarSystem = (function() {
             //since default size of the meshes is 1 ..we just multiply
             //it by the size of the object
             star.scale.multiplyScalar(data.star.size * 30);
-            horizon.scale.multiplyScalar(data.star.size+0.4);
+            horizon.scale.multiplyScalar(data.star.size + 10);
             //adding some meta data to keep track of the object more easily
             star.tag = {
                 object:'star',
@@ -194,7 +193,6 @@ App.Stages.StarSystem = (function() {
         
         //update the animation
         update: function(){
-           
             //updating camera position depending on controlls
             var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
             rotationMatrix.setRotationX(controller.degreesToRadians(cameraRotations.x));

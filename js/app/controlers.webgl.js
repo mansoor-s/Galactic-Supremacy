@@ -49,6 +49,7 @@ App.Controllers.webgl = (function() {
             this.jqDiv.on('mousedown mouseup mousemove dblclick click mousewheel', this._event);
             $(document).live('keydown keyup keypress', this._event);
 
+
             this.animate();
         },
 

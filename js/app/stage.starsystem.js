@@ -6,7 +6,6 @@ App.Stages.StarSystem = (function() {
     var meshes = {};
     var shapes = {};
     var farestCameraPosition = 5000;
-    var zoomLevelCurrent = 10;
     //flag for when the CTRL key is pressed
     var ctrPressed = false;
     //holds the coordinates for moving the camera when free camera is enabled
@@ -23,7 +22,7 @@ App.Stages.StarSystem = (function() {
     var cameraRotations;
     var cameraLookTarget;
     return {
-        cameraDistance: 2000,
+        cameraDistance: farestCameraPosition,
         //camera controls ,,,have to be public for the transition between 
         //galaxy and system view
        
@@ -53,19 +52,14 @@ App.Stages.StarSystem = (function() {
             this.showSystem(systemData);
 
             var loader = new THREE.JSONLoader();
-            loader.load( { model: './models/Shipyard.js', callback: function(geometry ) {
-                console.log('loaded model');
-                //geometry.materials[0][0].shading = THREE.FlatShading;
-                //geometry.materials[0][0].morphTargets = true;
-
+            loader.load( './models/Shipyard.js', function(geometry ) {
                 var material = new THREE.MeshFaceMaterial();
 
                 var mesh = new THREE.Mesh( geometry, material );
-                mesh.position.set( 20000, 20000, 10000);
-                console.log(mesh.position);
-                scene.addObject( mesh );
+                mesh.position.set( 2800, 50, 50);
+                scene.add( mesh );
                 
-            } } );
+            } );
         },
         _initializeGeometry:function(){
             meshes['sphere'] = new THREE.SphereGeometry( 1, 64, 62 );
@@ -79,13 +73,13 @@ App.Stages.StarSystem = (function() {
             //todo:add also textured materials
             var t = new Terrains();
             t.init();
-            materials = t._array;
+            materials = t.textures;
         },
         _initializeLights:function(){
             scene.add( new THREE.AmbientLight( 0xffffff ) );
 
             // create a point light
-            scene.add( new THREE.PointLight( 0xFFFFFF , 3));
+            scene.add( new THREE.PointLight( 0xFFFFFF , 1));
         },
         
         addSpace : function() {
@@ -130,17 +124,14 @@ App.Stages.StarSystem = (function() {
         
         //shows differend system depending on the data given
         showSystem: function(data){
-          
             //adding solar objects
-            var star = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['main_sequence'] );
-            var horizon = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['horizon'] );
-            selector = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials['selector'] );
+            var star = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials.stars[data.star.map] );
+            selector = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials.etc.selector );
             scene.add(selector);
             selector.visible = false;
             //since default size of the meshes is 1 ..we just multiply
             //it by the size of the object
             star.scale.multiplyScalar(data.star.size * 30);
-            horizon.scale.multiplyScalar(data.star.size + 10);
             //adding some meta data to keep track of the object more easily
             star.tag = {
                 object:'star',
@@ -148,26 +139,26 @@ App.Stages.StarSystem = (function() {
                 parent:scene
             }
             scene.add( star );
-            //scene.add( horizon );
             //this.addSpace();
             //matrix that will rotate the vectors
-            for(var i = 0;i<data.planets.length;i++){
-                var planet = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials[data.planets[i].type] );
-                planet.scale.multiplyScalar(data.planets[i].size * 50);
+            for(var i = 0; i < data.planets.length; i++){
+                var planet = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), 
+                    materials.planets[data.planets[i].map] );
+                planet.scale.multiplyScalar(data.planets[i].size * 100);
                 //set the position.and then rotate it...
-                planet.position.set(1,0,0).multiplyScalar(data.planets[i].distance * 600 + 100);
-                rotationMatrix.setRotationY(controller.degreesToRadians(360*data.planets[i].orbit));
+                planet.position.set(1,0,0).multiplyScalar(data.planets[i].distance * 600 + 400);
+                rotationMatrix.setRotationY(controller.degreesToRadians(360 * data.planets[i].orbit));
                 rotationMatrix.multiplyVector3(planet.position);
           
                 planet.tag = {
-                    object:'planet' + i,
-                    data:data.planets[i],
-                    parent:scene
+                    object: 'planet' + i,
+                    data: data.planets[i],
+                    parent: scene
                 }
                 scene.add( planet );
-                var grid  = new THREE.Line( shapes['circle'].createPointsGeometry(60),materials['grid'])
+                var grid  = new THREE.Line( shapes['circle'].createPointsGeometry(60), materials.etc.grid)
                 grid.rotation.x = controller.degreesToRadians(90);
-                grid.scale.multiplyScalar(data.planets[i].distance * 600 + 100)
+                grid.scale.multiplyScalar(data.planets[i].distance * 600 + 400)
          
                 grid.tag = {
                     object: 'grid' + i, 
@@ -176,7 +167,8 @@ App.Stages.StarSystem = (function() {
            
                 scene.add(grid);
                 for(var i2 = 0; i2 < data.planets[i].moons.length; i2++){
-                    var moon = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), materials[data.planets[i].moons[i2].type] );
+                    var moon = new THREE.Mesh( THREE.GeometryUtils.clone(meshes['sphere']), 
+                        materials.moons[data.planets[i].moons[i2].map] );
                     moon.scale.multiplyScalar(30);
                     //set distance(from planet)
                     moon.position.set(1,0,0).multiplyScalar((i2 * 200) + 400 + data.planets[i].size);
@@ -186,17 +178,17 @@ App.Stages.StarSystem = (function() {
                     //add planet position
                     moon.position.addSelf(planet.position);
                     moon.tag = {
-                        object:'moon'+i,
-                        data:data.planets[i].moons[i2],
-                        parent:planet
+                        object: 'moon' + i,
+                        data: data.planets[i].moons[i2],
+                        parent: planet
                     }
                     scene.add( moon );
-                    grid  = new THREE.Line( shapes['circle'].createPointsGeometry(60),materials['grid'])
+                    grid  = new THREE.Line( shapes['circle'].createPointsGeometry(60), materials.etc.grid);
                     grid.rotation.x = controller.degreesToRadians(90);
                     //distance from planet
                     grid.scale.multiplyScalar((i2 * 200) + 400 + data.planets[i].size)
                     grid.position = planet.position.clone();
-                    grid.tag={
+                    grid.tag = {
                         object:'grid'+i, 
                         parent:scene
                     }
@@ -235,7 +227,7 @@ App.Stages.StarSystem = (function() {
             //   controller.renderer.clear();
             //   composer.render(0.05);
             controller.renderer.clear();
-            controller.renderer.render(scene,camera);
+            controller.renderer.render(scene, camera);
 
         },
         onMouseClick:function(event){
@@ -250,7 +242,6 @@ App.Stages.StarSystem = (function() {
             var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 
             var intersects = ray.intersectScene( scene );
-
             if ( intersects.length > 0 ) {
                 if ( SELECTED != intersects[ 0 ].object ) {
 
@@ -261,7 +252,6 @@ App.Stages.StarSystem = (function() {
                     size.y += 0.1;
                     size.z += 0.1;
                     selector.scale = size;
-                    //console.log( intersects[ 0 ].object.scale.clone().scale.multiplyScalar(1));
                     SELECTED = intersects[ 0 ].object;
                     selector.visible =
                     new TWEEN.Tween( cameraLookTarget )
@@ -279,7 +269,7 @@ App.Stages.StarSystem = (function() {
 
         zoomOut: function(){
         
-            var newDistance = this.cameraDistance + (Math.pow(this.cameraDistance, .9));
+            var newDistance = this.cameraDistance + (Math.pow(this.cameraDistance, .85));
 
             new TWEEN.Tween( this  )
             .to({
@@ -292,7 +282,7 @@ App.Stages.StarSystem = (function() {
 
         zoomIn: function(){
 
-           var newDistance = this.cameraDistance - (Math.pow(this.cameraDistance, .9));
+           var newDistance = this.cameraDistance - (Math.pow(this.cameraDistance, .85));
 
             new TWEEN.Tween( this  )
             .to({

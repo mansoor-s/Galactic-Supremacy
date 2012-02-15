@@ -1,6 +1,6 @@
 window.App = {
-    Controllers:{},
-    Stages:{}
+    Controllers: {},
+    Stages: {}
 }
 App.settings = {
     version: 0.000,

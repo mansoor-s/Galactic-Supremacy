@@ -1,5 +1,8 @@
 $(document).ready(function() {
     
+    // initialize game
+    App.Controllers.App();
+
     $('a').hover(function(e) {
         e.preventDefault();
     });

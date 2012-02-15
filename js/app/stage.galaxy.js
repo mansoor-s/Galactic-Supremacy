@@ -2,7 +2,7 @@ App.Stages.Galaxy = (function() {
     var galaxyGeometry; 
     var camera;
     var scene;
-    var materials= [];
+    var materials = [];
     var starlist;
     var farestCameraPosition = 10000;
     var nearestCameraPosition = 200;

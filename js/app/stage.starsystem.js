@@ -333,9 +333,9 @@
             x:clickX,
             y:clickY
         };
-        if(delta>0){
+        if (delta > 0){
             this.zoomIn(mouseXY);
-        }else{                                                      
+        } else{                                                      
             this.zoomOut(mouseXY);            
         }
 

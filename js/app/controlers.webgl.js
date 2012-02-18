@@ -15,7 +15,6 @@
 
         this.renderer;
         this.projector;
-        this.jqDiv;
 
         // Create projector
         this.projector = new THREE.Projector();
@@ -70,14 +69,14 @@
     function render
     */
     Webgl.prototype.render = function() {
-        loops = 0;
+        this.loops = 0;
 
         // Attempt to update as many times as possible to get to our nextGameTick 'timeslot'
         // However, we only can update up to 10 times per frame
-        while ( (new Date).getTime() > this.nextGameTick && loops < this.MAX_FRAME_SKIP ) {
+        while ( (new Date).getTime() > this.nextGameTick && this.loops < this.MAX_FRAME_SKIP ) {
             this.update();
             this.nextGameTick += this.SKIP_TICKS;
-            loops++;
+            this.loops++;
         }
 
         // Render our scene

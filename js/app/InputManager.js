@@ -12,24 +12,38 @@
     }
 
     InputManager._namespaces = {};
-    /*
+    /********************************
+    *********************************
     Structure:
         namespaces: {
             'someScene': {
                 enabled: true,
                 bindings: {
-                    mouse: {
-                        'ctrl+mouseright': eventHanlder1
-                    },
-                    key: {
-                        'ctrl+c': eventHanlder2
-                    }
+                    mouse: [
+                        {
+                            keys: [
+                                'ctrl',
+                                'mouseright'
+                            ],
+                            handler: eventHanlder1
+                        }
+                    ],
+
+                    keyboard: [
+                        {
+                            keys: [
+                                'ctrl',
+                                'mouseleft'
+                            ],
+                            handler: eventHanlder2
+                        }
+                    ]
                 }
             }
         }
 
-
-    */
+    ************************************
+    ***********************************/
     
     InputManager._bindEvents = function() {
         this._$viewPort.on('keydown keyup keypress mousewheel',
@@ -90,15 +104,16 @@
         };
     };
 
-    InputManager.register = function(namespace, hotKeys, callback) {
-        if (InputManager._namespaces[namespace] === undefined) {
-            InputManager._namespaces[namespace] = {
+    InputManager.register = function(namespace, hotKey, callback) {
+        var space = InputManager._namespaces[namespace];
+        if (space === undefined) {
+            space = {
                 enabled: true,
                 bindings: {
                     mouse: {
                         
                     },
-                    keys: {
+                    keyboard: {
                         
                     }
                 }
@@ -106,12 +121,25 @@
         }
 
         //example keys: "ctrl+mouseright"
-        var keys string.parse(hotKeys, '+');
-            
+        var keys = hotKeys.split(hotKey, '+');
+        hotKey = '';
+        var isMouseEvent = false;
         for(var i = 0, len = keys.lenght; i < len; ++i) {
-            var space = InputManager._namespace[namespace];
-            space.enabled = true;
-            space.
+            keys[i] = keys[i].toLowerCase();
+            if (inputManger._mouseMoveEvents.indexOf(key[i]) !== -1) {
+                isMouseEvent = true;
+            }            
+            
+        }
+        var hotKeyObj = {
+            keys: keys,
+            handler: callback
+        };
+
+        if (isMouseEvent) {
+            space.mouse.push(hotKeyObj);
+        } else {
+            space.keyboard.push(hotKeyObj);
         }
 
     };

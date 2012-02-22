@@ -106,7 +106,7 @@
         }
 
         //example keys: "ctrl+mouseright"
-        var keys string.parse(hotKeys, '+');
+        var keys = string.parse(hotKeys, '+');
             
         for(var i = 0, len = keys.lenght; i < len; ++i) {
             var space = InputManager._namespace[namespace];

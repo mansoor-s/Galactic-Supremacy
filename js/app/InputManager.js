@@ -121,9 +121,14 @@
         }
 
         //example keys: "ctrl+mouseright"
+<<<<<<< HEAD
         var keys = hotKeys.split(hotKey, '+');
         hotKey = '';
         var isMouseEvent = false;
+=======
+        var keys = string.parse(hotKeys, '+');
+            
+>>>>>>> 270a1ddc9845eb23baee6204dce9a539c9d3a7d9
         for(var i = 0, len = keys.lenght; i < len; ++i) {
             keys[i] = keys[i].toLowerCase();
             if (inputManger._mouseMoveEvents.indexOf(key[i]) !== -1) {

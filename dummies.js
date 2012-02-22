@@ -29,7 +29,7 @@ systemData = {
         map: "volcanic0",
         orbit:0.5,
         moons: [
-        ]
+    ]
     },
 		
     {
@@ -84,9 +84,45 @@ systemData = {
     }
 
     ],
-    astroids: [
+    ships:[
     {
-			
+        type:"cruiser",
+        position:{
+            x:2780,
+            y:50,
+            z:50
+        },
+        rotation:{
+            x:0,
+            y:0,
+            z:0
+        }
+    },
+    {
+        type:"cruiser",
+        position:{
+            x:2820,
+            y:50,
+            z:50
+        },
+        rotation:{
+            x:0,
+            y:0,
+            z:0
+        }
+    },
+    {
+        type:"cruiser",
+        position:{
+            x:2800,
+            y:50,
+            z:20
+        },
+        rotation:{
+            x:0,
+            y:0,
+            z:0
+        }
     }
     ]
 }

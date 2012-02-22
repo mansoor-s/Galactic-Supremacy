@@ -10,7 +10,7 @@
         this.farestCameraPosition = 5000;
         var self = this;
         //flag for when the CTRL key is pressed
-        var ctrPressed = false;
+        this.ctrPressed = false;
         //holds the coordinates for moving the camera when free camera is enabled
         var ctrMouse = {
             x: 0,
@@ -276,7 +276,7 @@
         if (e.keyCode === 17) {
             //ctrMouse.initX = currentMouse.x;
             //ctrMouse.initY = currentMouse.y;
-            ctrPressed = true;
+            this.ctrPressed = true;
         //left
         } else if (e.keyCode === 37) {
             yRot = this.cameraRotations.y - turnUnits;
@@ -288,7 +288,7 @@
             if(this.cameraRotations.x > 80) {
                 xRot = 80;
             } else {
-                xRot = cthis.ameraRotations.x + turnUnits;
+                xRot = this.cameraRotations.x + turnUnits;
             }
 
         //down
@@ -323,7 +323,7 @@
         event.preventDefault();
 
         //if free camera mode is enabled do nothing because nasty thing will happen
-        if (ctrPressed) {
+        if (this.ctrPressed) {
             return;
         }
 

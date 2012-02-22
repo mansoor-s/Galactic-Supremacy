@@ -30,7 +30,8 @@
             'keydown': 'onKeyDown',
             'keyup': 'onKeyUp',
             "click": 'onMouseClick',
-            'mousewheel': 'onMouseWheel'
+            'mousewheel': 'onMouseWheel',
+            'mousemove': 'onMouseMove'
         };
         
         var $viewport = this._controller.getViewport();
@@ -70,8 +71,10 @@
         this.shapes['circle'].arc( 0, 0, 1, 0, Math.PI * 2, false );
         
         //todo... move to resource loader   
+        this.meshes.ships = {}
         var loader = new THREE.JSONLoader();
         loader.load( './models/Shipyard.js', $.proxy(function(geometry ) {
+            geometry.computeBoundingSphere();
             this.meshes.ships['cruiser'] = geometry;
             this.createShips(systemData);
         },this) );
@@ -106,7 +109,6 @@
         star.scale.multiplyScalar(data.star.size * 30);
         //adding some meta data to keep track of the object more easily
         star.tag = {
-            object: 'star',
             data: data.star,
             parent: this.scene
         }
@@ -121,24 +123,22 @@
             //set the position.and then rotate it...
             planet.position.set(1,0,0).multiplyScalar(data.planets[i].distance * 600 + 400);
             
-            this.rotationMatrix.setRotationY(this._controller.degreesToRadians(360 * data.planets[i].orbit));
+            this.rotationMatrix.setRotationY(degreesToRadians(360 * data.planets[i].orbit));
             this.rotationMatrix.multiplyVector3(planet.position);
             
             planet.castShadow = true;
             planet.receiveShadow = true;
             planet.tag = {
-                object: 'planet' + i,
                 data: data.planets[i],
                 parent: this.scene
             }
             this.scene.add( planet );
             //adding orbit lines
             var grid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.grid)
-            grid.rotation.x = this._controller.degreesToRadians(90);
+            grid.rotation.x = degreesToRadians(90);
             grid.scale.multiplyScalar(data.planets[i].distance * 600 + 400)
      
             grid.tag = {
-                object: 'grid' + i, 
                 parent: this.scene
             }
        
@@ -152,23 +152,21 @@
                 //set distance(from planet)
                 moon.position.set(1,0,0).multiplyScalar((i2 * 200) + 400 + data.planets[i].size);
                 //rotate
-                this.rotationMatrix.setRotationY(this._controller.degreesToRadians(360*data.planets[i].moons[i2].orbit));
+                this.rotationMatrix.setRotationY(degreesToRadians(360*data.planets[i].moons[i2].orbit));
                 this.rotationMatrix.multiplyVector3(moon.position);
                 //add planet position
                 moon.position.addSelf(planet.position);
                 moon.tag = {
-                    object: 'moon' + i,
                     data: data.planets[i].moons[i2],
                     parent: planet
                 }
                 this.scene.add( moon );
                 grid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.grid);
-                grid.rotation.x = this._controller.degreesToRadians(90);
+                grid.rotation.x = degreesToRadians(90);
                 //distance from planet
                 grid.scale.multiplyScalar((i2 * 200) + 400 + data.planets[i].size)
                 grid.position = planet.position.clone();
                 grid.tag = {
-                    object: 'grid' + i, 
                     parent: this.scene
                 }
        
@@ -179,22 +177,37 @@
     StarSystem.prototype.createShips = function(data){
         var material = new THREE.MeshFaceMaterial();
         for(var i = 0;i<data.ships.length;i++){
-            var ship = new THREE.mesh(this.meshes.ships[data.ships[i].type],material);
+            var ship = new THREE.Mesh(this.meshes.ships[data.ships[i].type],material);
             ship.position.set(data.ships[i].position.x, data.ships[i].position.y, data.ships[i].position.z);
             ship.rotation.set(data.ships[i].rotation.x, data.ships[i].rotation.y, data.ships[i].rotation.z);
-            ship.tag = {
-                object: 'ship' + i, 
-                parent: this.scene
-            }
+            ship.scale.set(2,2,2);
+            
             this.scene.add(ship);
+            var shipGrid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.grid)
+            shipGrid.position.set(data.ships[i].position.x, data.ships[i].position.y, data.ships[i].position.z);
+            shipGrid.rotation.x = degreesToRadians(90);
+            shipGrid.scale = ship.scale.clone();
+            shipGrid.scale.multiplyScalar(this.meshes.ships[data.ships[i].type].boundingSphere.radius);
+            
+            ship.tag = {
+                parent: this.scene,
+                data:data.ships[i],
+                grid:shipGrid
+            }
+            shipGrid.tag = {
+                parent: ship
+            };
+            this.scene.add(shipGrid);
+            
+            
         }
     }
     StarSystem.prototype.update = function(){
         //updating camera position depending on controlls
         var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
-        this.rotationMatrix.setRotationX(this._controller.degreesToRadians(this.cameraRotations.x));
+        this.rotationMatrix.setRotationX(degreesToRadians(this.cameraRotations.x));
         this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
-        this.rotationMatrix.setRotationY(this._controller.degreesToRadians(this.cameraRotations.y));
+        this.rotationMatrix.setRotationY(degreesToRadians(this.cameraRotations.y));
         this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
         
         this.camera.position.x = this.cameraLookTarget.x;
@@ -226,8 +239,21 @@
         this.mouse.y = - ( event.offsetY / $viewport.height()) * 2 + 1;
     
     }
+    
+    StarSystem.prototype.selectPlanet= function(planetObject){
+        
+    }
+    StarSystem.prototype.deselectPlanet= function(planetObject){
+        
+    }
+    StarSystem.prototype.selectShip= function(shipObject){
+        
+    }
+    StarSystem.prototype.deselectShip= function(shipObject){
+        
+    }
     StarSystem.prototype.onMouseClick = function(event){
-         // find intersections
+        // find intersections
         var vector = new THREE.Vector3( this.mouse.x, this.mouse.y, 1 );
         this._controller.projector.unprojectVector( vector, this.camera );
         //use three.ray to find intersecting geometry
@@ -248,7 +274,10 @@
                 new TWEEN.Tween( this.cameraLookTarget )
                 .to(intersects[ 0 ].object.position, 1500 )
                 .start()
-                
+            //todo need to rework the whole intersection business
+            // if (this.SELECTED.tag.object.substr(0,4) === 'ship'){
+            //      this.SELECTED.tag.grid.material = this.materials.etc.grid2;
+            // }
             }
 
         } else {

@@ -31,7 +31,7 @@
                     ambient: 0x555555, 
                     color: 0x888888
                 }, true),
-                volcanic0: this.imageTexture("venus.gif", { }, true),
+                volcanic0: this.imageTexture("venus.jpg", { }, true),
                 desert0: this.imageTexture("desert1.jpg", {
                     ambient: 0x555555, 
                     color: 0x888888
@@ -65,6 +65,11 @@
                 }),
                 grid: this.lineTexture({
                     color: 0x293A45, 
+                    opacity: 0.9, 
+                    smooth: true
+                }), 
+                grid2: this.lineTexture({
+                    color: 0xff0000, 
                     opacity: 0.9, 
                     smooth: true
                 }),

@@ -88,7 +88,7 @@ systemData = {
     {
         type:"cruiser",
         position:{
-            x:2800,
+            x:2780,
             y:50,
             z:50
         },
@@ -116,7 +116,7 @@ systemData = {
         position:{
             x:2800,
             y:50,
-            z:40
+            z:20
         },
         rotation:{
             x:0,

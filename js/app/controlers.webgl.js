@@ -20,10 +20,9 @@
         this.projector = new THREE.Projector();
 
         // Create renderer
-        this.renderer = new THREE.WebGLRenderer({
-            antialias: true,
-        } );
-
+        this.renderer = new THREE.WebGLRenderer();
+ 
+        this.renderer.antialias = true;
         this.renderer.shadowMapEnabled = true;
         this.renderer.setClearColor( 0xff0000, 1 );
         this.renderer.autoClear = false;
@@ -84,39 +83,21 @@
     };
 
     //gets position in the z plane of a givvent mouse coordinates
-    Webgl.prototype.getWorldXYZ = function(camera, xyPosition, z) {
-
-        var mousex = ( xyPosition.x / this.jqDiv.width() ) * 2 - 1;
-        var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 - 1;
-      
-        var vector = new THREE.Vector3( -mousex, mousey, -1 );
+    Webgl.prototype.getIntersectionWithYPlane = function(camera, mouse, y) {
+        var vector = new THREE.Vector3( mouse.x, mouse.y, -1 );
 
         this.projector.unprojectVector( vector, camera );
-                    
         var origin = camera.matrixWorld.getPosition();
         
-
         vector =  vector.subSelf( origin ).normalize();
         
-        var scalar =(origin.z - z  )/vector.z;   
-
+        var scalar =(y - origin.y) / vector.y
         var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
 
-        intersection.z = z;
         return intersection;
     };
-
-    //helpful functions
-    Webgl.prototype.degreesToRadians = function(degrees){
-        return (eval(degrees))*(Math.PI/180);
-    };
-
-    Webgl.prototype.radiansToDegrees = function(radians){
-        return (eval(radians))*(180/Math.PI);
-    };
-
     Webgl.prototype.toScreenPrepare = function(camera){
-        projScreenMat.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+        this.projScreenMat.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
     };
 
     Webgl.prototype.toScreenXY = function(position) {

@@ -8,20 +8,20 @@
         this.meshes = {};
         this.shapes = {};
         this.farestCameraPosition = 5000;
-        var self = this;
-        //flag for when the CTRL key is pressed
-        this.ctrPressed = false;
-        //holds the coordinates for moving the camera when free camera is enabled
-        var ctrMouse = {
-            x: 0,
-            y: 0,
-            initX: 0,
-            initY: 0
+        
+        //input managment
+        this.mouse = {
+            x:0,
+            y:0
         };
+        
+        
         //keeps the intersected object for now
         this.selector;
         this.SELECTED;
         this.rotationMatrix = new THREE.Matrix4();
+        
+        //camera control
         this.cameraRotations;
         this.cameraLookTarget;
         this.cameraDistance = this.farestCameraPosition;
@@ -55,17 +55,9 @@
         this._initializeLights();
         this._initializeMaterials();
         this._initializeGeometry();
+      
         this.createSystem(systemData);
-
-        var loader = new THREE.JSONLoader();
-        loader.load( './models/Shipyard.js', function(geometry ) {
-            var material = new THREE.MeshFaceMaterial();
-
-            var mesh = new THREE.Mesh( geometry, material );
-            mesh.position.set( 2800, 50, 50);
-            self.scene.add( mesh );
-            
-        } );
+   
     };
     
     StarSystem.prototype._initializeGeometry = function(){
@@ -76,13 +68,20 @@
         this.shapes['circle'] = new THREE.Shape();
         this.shapes['circle'].moveTo(0,0);
         this.shapes['circle'].arc( 0, 0, 1, 0, Math.PI * 2, false );
+        
+        //todo... move to resource loader   
+        var loader = new THREE.JSONLoader();
+        loader.load( './models/Shipyard.js', $.proxy(function(geometry ) {
+            this.meshes.ships['cruiser'] = geometry;
+            this.createShips(systemData);
+        },this) );
     };
 
     StarSystem.prototype._initializeMaterials = function(){
         //initialized all materials
         //todo:add also textured materials
-        var t = new Terrains();
-        t.init();
+        var t = App.Resources;
+        t.initialize();
         this.materials = t.textures;
     },
 
@@ -133,6 +132,7 @@
                 parent: this.scene
             }
             this.scene.add( planet );
+            //adding orbit lines
             var grid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.grid)
             grid.rotation.x = this._controller.degreesToRadians(90);
             grid.scale.multiplyScalar(data.planets[i].distance * 600 + 400)
@@ -176,7 +176,19 @@
             }
         }
     };
-
+    StarSystem.prototype.createShips = function(data){
+        var material = new THREE.MeshFaceMaterial();
+        for(var i = 0;i<data.ships.length;i++){
+            var ship = new THREE.mesh(this.meshes.ships[data.ships[i].type],material);
+            ship.position.set(data.ships[i].position.x, data.ships[i].position.y, data.ships[i].position.z);
+            ship.rotation.set(data.ships[i].rotation.x, data.ships[i].rotation.y, data.ships[i].rotation.z);
+            ship.tag = {
+                object: 'ship' + i, 
+                parent: this.scene
+            }
+            this.scene.add(ship);
+        }
+    }
     StarSystem.prototype.update = function(){
         //updating camera position depending on controlls
         var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
@@ -206,15 +218,17 @@
     };
 
 
-    StarSystem.prototype.onMouseClick = function(event){
-        var  mouse = {};
-
+    StarSystem.prototype.onMouseMove = function(event){
+    
 
         var $viewport = this._controller.getViewport();
-        mouse.x = ( event.clientX / $viewport.width()) * 2 - 1;
-        mouse.y = - ( event.clientY / $viewport.height()) * 2 + 1;
-        // find intersections
-        var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+        this.mouse.x = ( event.offsetX / $viewport.width()) * 2 - 1;
+        this.mouse.y = - ( event.offsetY / $viewport.height()) * 2 + 1;
+    
+    }
+    StarSystem.prototype.onMouseClick = function(event){
+         // find intersections
+        var vector = new THREE.Vector3( this.mouse.x, this.mouse.y, 1 );
         this._controller.projector.unprojectVector( vector, this.camera );
         //use three.ray to find intersecting geometry
         var ray = new THREE.Ray( this.camera.position, vector.subSelf( this.camera.position ).normalize() );
@@ -258,7 +272,7 @@
 
 
     StarSystem.prototype.zoomIn = function(){
-       var newDistance = this.cameraDistance - (Math.pow(this.cameraDistance, .85));
+        var newDistance = this.cameraDistance - (Math.pow(this.cameraDistance, .85));
 
         new TWEEN.Tween( this  )
         .to({
@@ -322,21 +336,10 @@
     StarSystem.prototype.onMouseWheel = function(event,delta){
         event.preventDefault();
 
-        //if free camera mode is enabled do nothing because nasty thing will happen
-        if (this.ctrPressed) {
-            return;
-        }
-
-        var clickX= event.pageX - $(event.target).position().left;
-        var clickY= event.pageY - $(event.target).position().top;
-        var mouseXY = {
-            x:clickX,
-            y:clickY
-        };
         if (delta > 0){
-            this.zoomIn(mouseXY);
+            this.zoomIn();
         } else{                                                      
-            this.zoomOut(mouseXY);            
+            this.zoomOut();            
         }
 
     };

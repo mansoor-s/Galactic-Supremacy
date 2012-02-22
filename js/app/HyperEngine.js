@@ -3,8 +3,8 @@ function createStars() {
         x: .6,//675,
         y: .6
     }
-    var zRandomOffsetRange = 175;
-    var starsPerArm = 125000;
+    var zRandomOffsetRange = 1000;
+    var starsPerArm = 5000;
     var randomOffsetRange = 2000;
     var A = 4000;
     xTransform = spiralTransformations.x || .6;  // "scale. higher = more zoomed in"
@@ -165,9 +165,9 @@ function middleBiasedRand(maxOffset) {
     var sudoRand = Math.round(Math.random());
     var rand;
     if (sudoRand === 1) {
-        rand =  -1 * Math.pow(Math.random(), 1.75) * maxOffset;
+        rand =  -1 * Math.pow(Math.random(), 1.5) * maxOffset;
     } else {
-        rand = Math.pow(Math.random(), 1.75) * maxOffset;
+        rand = Math.pow(Math.random(), 1.5) * maxOffset;
     }
     
     return rand;

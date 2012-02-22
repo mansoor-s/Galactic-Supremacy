@@ -2,11 +2,14 @@ App.Stages.Galaxy = (function() {
     var galaxyGeometry; 
     var camera;
     var scene;
-    var materials= [];
+    var materials = [];
     var starlist;
+    var farestCameraPosition = 10000;
+    var nearestCameraPosition = 200;
+    var cameraDistance = farestCameraPosition;
     //the levels of zoom
-    var zoomLevelCurrent = 1;//
-    var zoomLevelCount = 50; 
+    var zoomLevelCurrent = 0;//
+    var zoomLevelCount = 37; 
     var controller;
     var particleSystem;
     var starSize = 5;
@@ -38,9 +41,9 @@ App.Stages.Galaxy = (function() {
     return {
         //camera controls ,,,have to be public for the transition between 
         //galaxy and system view
-        cameraLookTarget:new THREE.Vector3(0,0,0),
-        cameraDistance:40000,
-        cameraRotations:new THREE.Vector3(45,0,0),
+        cameraLookTarget:new THREE.Vector3(0, 0, 0),
+        
+        cameraRotations:new THREE.Vector3(0, 0, 0),
         
         initialize:function (webgl) {
             controller = webgl;
@@ -48,10 +51,11 @@ App.Stages.Galaxy = (function() {
             starlist = createStars();
             
             // Initialize camera
-            camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 60000 );
+            camera = new THREE.PerspectiveCamera( 45, controller.jqDiv.width() / controller.jqDiv.height(), 1, 90000 );
             
             camera.matrixAutoUpdate = true;
             
+            cameraDistance = farestCameraPosition;
             // Create scene
             scene = new THREE.Scene();
 
@@ -71,8 +75,7 @@ App.Stages.Galaxy = (function() {
             // create geometry for the particle system  and add vertices to it
             galaxyGeometry = new THREE.Geometry();
             for ( i = 0; i < starlist.length; i ++ ) {
-                //todo :  
-                var vector = new THREE.Vector3( starlist[i].x,starlist[i].y,starlist[i].z);
+                var vector = new THREE.Vector3( starlist[i].x, starlist[i].y, starlist[i].z );
                 galaxyGeometry.vertices.push( new THREE.Vertex( vector ) );
                 galaxyGeometry.colors[i] = new THREE.Color( starColors[starlist[i].type] );
             }
@@ -102,18 +105,13 @@ App.Stages.Galaxy = (function() {
         },
 
         update: function(){
-            //we have to rewrite this one       
-            if (ctrPressed) {
-            
-            }
-          
             //updating camera position depending on controlls
-            var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
+            var distanceVector = new THREE.Vector3(0,0,-cameraDistance);
             rotationMatrix.setRotationX(controller.degreesToRadians(this.cameraRotations.x));
             distanceVector = rotationMatrix.multiplyVector3(distanceVector);
             rotationMatrix.setRotationY(controller.degreesToRadians(this.cameraRotations.y));
             distanceVector = rotationMatrix.multiplyVector3(distanceVector);
-            //i had trouble with just 1 line so i used 3
+            
             camera.position.x = this.cameraLookTarget.x;
             camera.position.y = this.cameraLookTarget.y;
             camera.position.z = this.cameraLookTarget.z;
@@ -128,10 +126,22 @@ App.Stages.Galaxy = (function() {
 
         render: function(){
             //call render for the stage
+
+            if (ctrPressed) {
+                //camera.position.x += ( mouseX - camera.position.x ) * 0.01;
+                //camera.position.y += ( -mouseY - camera.position.y ) * 0.01;
+                camera.lookAt( {
+                    x: ( mouseX - camera.position.x ) * 0.01, 
+                    y: ( -mouseY - camera.position.y ) * 0.01, 
+                    z: 0
+                } ); 
+            }
             //postprocessing render
             controller.renderer.clear();
-            composer.render(0.05);
+            composer.render();
          
+        //   controller.renderer.render(scene,camera);
+
         },
 
         onKeyDown: function(e) {
@@ -148,18 +158,16 @@ App.Stages.Galaxy = (function() {
                 this.cameraRotations.y += 1
             //up
             }else if (e.keyCode === 38) {
-                this.cameraRotations.x += 2;
-                if(this.cameraRotations.x > 80)this.cameraRotations.x =80;
+                this.cameraRotations.x -= 1
             //down
             }else if (e.keyCode === 40) {
-                this.cameraRotations.x -= 2;
-                if(this.cameraRotations.x < -80)this.cameraRotations.x = -80;
+                this.cameraRotations.x += 1
             //add
             }else if (e.keyCode === 107) {
-                this.cameraDistance -=100;
+                this.cameraDistance -=1;
             //subtract
             }else if (e.keyCode === 109) {
-                this.cameraDistance +=100;
+                this.cameraDistance +=1;
             }
 
         },
@@ -170,8 +178,9 @@ App.Stages.Galaxy = (function() {
             }
         },
 
-      
-        getClosestStar:function(){
+        getClosestStar:function(xy){
+            xy.x = ( xy.x / controller.jqDiv.width() ) * 2 - 1;
+            xy.y =  -( xy.y / controller.jqDiv.height()) * 2 + 1;
             controller.toScreenPrepare(camera);
             var target = starlist[0];
             var targetDistance = 9999;
@@ -182,55 +191,57 @@ App.Stages.Galaxy = (function() {
                 } 
                 var vector = new THREE.Vector3( starlist[i].x, starlist[i].y, starlist[i].z );
                 var pos2d =  controller.toScreenXY(vector);
-                var distanceX = Math.abs(pos2d.x - currentMouse.x);
-                var distanceY = Math.abs(pos2d.y - currentMouse.y);
+                var distanceX = Math.abs(pos2d.x - xy.x);
+                var distanceY = Math.abs(pos2d.y - xy.y);
                 var distance =  Math.sqrt(distanceX*distanceX+distanceY*distanceY);
                 if(targetDistance > distance){
-                    target = starlist[i]; 
-                    target.id = i;
+                    target = starlist[i];  
                     targetDistance = distance ;  
                 }
             }
             return target;
         },
-        zoomIn: function(){
+
+        zoomIn: function(xy){
             if (zoomLevelCurrent === zoomLevelCount) {
                 return;
             }
             zoomLevelCurrent++;
 
             //animate camera to new position 
-            new TWEEN.Tween( this )
+            new TWEEN.Tween( camera.position )
             .to({
-                //    cameraDistance: (farestCameraPosition-nearestCameraPosition) - (((farestCameraPosition-nearestCameraPosition)/zoomLevelCount) *zoomLevelCurrent)+nearestCameraPosition
-                cameraDistance: (1 / zoomLevelCurrent) * 40000  - 750
+                cameraDistance: 1000
             }, 500 )
             .start()
 
-            this.centerOn() 
+            //this.centerOn(xy) 
         },
-        zoomOut: function(){
+        
+        zoomOut: function(xy){
+            var levelOne = false
             //change the current zoom level
-            if (zoomLevelCurrent === 1) {
+            if (zoomLevelCurrent === 0) {
                 return;
-            } 
+            } else if (zoomLevelCurrent === 1) {
+                levelOne = true
+            }
             zoomLevelCurrent--;
 
-            new TWEEN.Tween( this )
+            new TWEEN.Tween(  this  )
             .to({     
-                //   cameraDistance: !levelOne ?  (farestCameraPosition-nearestCameraPosition) - (((farestCameraPosition-nearestCameraPosition)/zoomLevelCount) *zoomLevelCurrent)+nearestCameraPosition: farestCameraPosition
-                cameraDistance: (1 / zoomLevelCurrent) * 40000 - 750
+                cameraDistance: 10000
             }, 500 )
             .start()
 
-            this.centerOn() 
+            //this.centerOn(xy) 
         },
 
         //moves the stars so that position is at the center of the screen
-        centerOn: function(){
+        centerOn: function(mousePosition){
             var position;
        
-            if (currentMouse === undefined) {
+            if (mousePosition === undefined) {
                 position = {
                     x: 0, 
                     y: 0, 
@@ -238,14 +249,13 @@ App.Stages.Galaxy = (function() {
                 };
             } else {
                 //method 1:look for intersection with z plane
-                position = controller.getIntersectionWithY(camera,currentMouse,0);
+                var z = 0;
+                position = controller.getWorldXYZ(camera,mousePosition,z);
             //method 2:look for closest star to cursor
-            //  position = this.getClosestStar();
+            // position = this.getClosestStar(mousePosition);
                 
             }         
-            if(zoomLevelCount === zoomLevelCurrent){
-                position = this.getClosestStar();
-            } 
+     
             new TWEEN.Tween( this.cameraLookTarget )
             .to({
                 x: position.x,
@@ -256,7 +266,7 @@ App.Stages.Galaxy = (function() {
           
 
         },
-       
+
         //mousewheel handler
         onMouseWheel: function(event,delta){
             event.preventDefault();
@@ -266,31 +276,32 @@ App.Stages.Galaxy = (function() {
                 return;
             }
 
-            currentMouse.x = (event.offsetX / controller.jqDiv.width()) * 2 - 1;
-            currentMouse.y = -(event.offsetY / controller.jqDiv.height()) * 2 + 1;
-  
+            var clickX= event.pageX - $(event.target).position().left;
+            var clickY= event.pageY - $(event.target).position().top;
+            var mouseXY = {
+                x:clickX,
+                y:clickY
+            };
             if(delta>0){
-                this.zoomIn();
+                this.zoomIn(mouseXY);
             }else{                                                      
-                this.zoomOut();            
+                this.zoomOut(mouseXY);            
             }
 
         },
         //mouseclick handler
         onMouseClick: function(event){
-            currentMouse.x = (event.offsetX / controller.jqDiv.width()) * 2 - 1;
-            currentMouse.y = -(event.offsetY / controller.jqDiv.height()) * 2 + 1;
-  
-            if(zoomLevelCount === zoomLevelCurrent){
-                App.Controllers.Network.getSystemInfo(this.getClosestStar().id,controller.switchStages)
-            }
+
           
-            this.centerOn();
+            this.centerOn({
+                x: event.offsetX, 
+                y: event.offsetY
+            });
         },
 
         onMouseMove: function(event) {
-            currentMouse.x = (event.offsetX / controller.jqDiv.width()) * 2 - 1;
-            currentMouse.y = -(event.offsetY / controller.jqDiv.height()) * 2 + 1;
+            currentMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            currentMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         },
 
         //declaring all event handlers                         

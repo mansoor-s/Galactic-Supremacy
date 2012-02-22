@@ -1,138 +1,142 @@
-App.Controllers.webgl = (function() {
+(function() {
+    "use strict";
+    var Webgl = App.Controllers.Webgl = function($viewport) {
+        this._$viewport = $viewport;
 
-    var currentStage;
-    // Game loop
-    var loops = 0,
-    nextGameTick = (new Date).getTime(),
+        // Game loop
+        this.loops = 0,
+        this.nextGameTick = (new Date).getTime(),
 
-    // Constants
-    FPS = 60,
-    MAX_FRAME_SKIP = 10,
-    SKIP_TICKS = 1000 / FPS;
-    var projScreenMat = new THREE.Matrix4();
-    return {
+        // Constants
+        this.FPS = 60,
+        this.MAX_FRAME_SKIP = 10,
+        this.SKIP_TICKS = 1000 / this.FPS;
+        this.projScreenMat = new THREE.Matrix4();
 
-        // App variables
-        renderer: null,        
-        projector: null,
-        jqDiv: null,
-        /*
-        Initialize scene
-        */
-        initialize: function(jqElement) {
-            this.jqDiv = jqElement;
-            _.bindAll( this, "animate", "render", "update" );
+        this.renderer;
+        this.projector;
 
-            // Create projector
-            this.projector = new THREE.Projector();
+        // Create projector
+        this.projector = new THREE.Projector();
 
-            // Create renderer
-            this.renderer = new THREE.WebGLRenderer({
-                antialias:true
-            } );
-            this.renderer.setClearColor( 0xff0000, 1 );
-            this.renderer.autoClear = false;
-            this.renderer.setSize( this.jqDiv.width(), this.jqDiv.height() );
-            // initialize fps counter
-            stats = new Stats(); 
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.top = '75px';
-            stats.domElement.style.right = '0px';
-            this.jqDiv.append(stats.domElement);
-            this.jqDiv.append(this.renderer.domElement);
+        // Create renderer
+        this.renderer = new THREE.WebGLRenderer({
+            antialias: true,
+        } );
 
-            //initialize all stages
-            App.Stages.StarSystem.initialize(this)
-            App.Stages.Galaxy.initialize(this)
-            currentStage = App.Stages.Galaxy;
-            //event binding
+        this.renderer.shadowMapEnabled = true;
+        this.renderer.setClearColor( 0xff0000, 1 );
+        this.renderer.autoClear = false;
+        this.renderer.setSize( this._$viewport.width(), this._$viewport.height() );
 
-            this.jqDiv.on('mousedown mouseup mousemove dblclick click mousewheel', this._event);
-            $(document).live('keydown keyup keypress', this._event);
+        // initialize fps counter
+        this.stats = new Stats(); 
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.top = '75px';
+        this.stats.domElement.style.right = '0px';
+        this._$viewport.append(this.stats.domElement);
+        this._$viewport.append(this.renderer.domElement);
 
-            this.animate();
-        },
-
-        switchStages:function(arguments){
-            if (arguments.act === 'GalaxyToStar'){
-                currentStage = App.Stages.StarSystem;
-                currentStage.showSystem(arguments.data);
-                App.Stages.Galaxy.cameraDistance = 10;
-             App.Stages.StarSystem.cameraRotations = App.Stages.Galaxy.cameraRotations;
-                
-            }
-        },
-        /*
-        function animate
-        Game loop - requests each new frame
-        */
-        animate: function() {  
-            requestAnimationFrame( this.animate ); 
-            stats.update();      
-            this.render();   
-        },
+        //render the current stage
+        this.currentStage = new App.Stages.StarSystem(this);
 
 
+        //event binding
+        this._$viewport.on('mousedown mouseup mousemove dblclick click mousewheel', this.onEvent());
+        $(document).live('keydown keyup keypress', this.onEvent());
 
-        /*
-        function update
-        Handles game state updates
-        */
-        update: function() {
-            currentStage.update();
-        },
-
-
-        /*
-        function render
-        */
-        render: function() {
-            loops = 0;
-
-            // Attempt to update as many times as possible to get to our nextGameTick 'timeslot'
-            // However, we only can update up to 10 times per frame
-            while ( (new Date).getTime() > nextGameTick && loops < MAX_FRAME_SKIP ) {
-                this.update();
-                nextGameTick += SKIP_TICKS;
-                loops++;
-            }
-
-            // Render our scene
-            currentStage.render();
-
-        },
-        //gets position in the z plane of a givvent mouse coordinates
-        getIntersectionWithY:function(camera,xyPosition,y){
-
-            var origin = camera.position;
-            var vector =  this.projector.unprojectVector(new THREE.Vector3(xyPosition.x,xyPosition.y,1), camera);
-           
-            var y_plane_point = y;
-            vector.subSelf(origin).normalize();
-            var scalar =(y_plane_point - origin.y) / vector.y
-            var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
-
-            return intersection;
-        },
-        //helpful functions
-        degreesToRadians:function(degrees){
-            return (eval(degrees))*(Math.PI/180);
-        },
-        radiansToDegrees:function(radians){
-            return (eval(radians))*(180/Math.PI);
-        },
-        toScreenPrepare:function(camera){
-            projScreenMat.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
-        },
-        toScreenXY:function( position) {
-            var pos = position.clone();
-            projScreenMat.multiplyVector3( pos );
-            return pos;
-
-        },
-        //pass the event handling to proper stage
-        _event:function(event,delta){
-            currentStage._event(event,delta);
-        }
+        this.animate();
     };
-}());
+
+    Webgl.prototype.animate = function() {
+        var self = this;
+        (function animateInner() {
+            requestAnimationFrame( animateInner ); 
+            self.stats.update();      
+            self.render(); 
+        })();
+    };
+
+    /*
+    function update
+    Handles game state updates
+    */
+    Webgl.prototype.update = function() {
+        this.currentStage.update();
+    };
+
+    /*
+    function render
+    */
+    Webgl.prototype.render = function() {
+        this.loops = 0;
+
+        // Attempt to update as many times as possible to get to our nextGameTick 'timeslot'
+        // However, we only can update up to 10 times per frame
+        while ( (new Date).getTime() > this.nextGameTick && this.loops < this.MAX_FRAME_SKIP ) {
+            this.update();
+            this.nextGameTick += this.SKIP_TICKS;
+            this.loops++;
+        }
+
+        // Render our scene
+        this.currentStage.render();
+    };
+
+    //gets position in the z plane of a givvent mouse coordinates
+    Webgl.prototype.getWorldXYZ = function(camera, xyPosition, z) {
+
+        var mousex = ( xyPosition.x / this.jqDiv.width() ) * 2 - 1;
+        var mousey =  ( xyPosition.y / this.jqDiv.height()) * 2 - 1;
+      
+        var vector = new THREE.Vector3( -mousex, mousey, -1 );
+
+        this.projector.unprojectVector( vector, camera );
+                    
+        var origin = camera.matrixWorld.getPosition();
+        
+
+        vector =  vector.subSelf( origin ).normalize();
+        
+        var scalar =(origin.z - z  )/vector.z;   
+
+        var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
+
+        intersection.z = z;
+        return intersection;
+    };
+
+    //helpful functions
+    Webgl.prototype.degreesToRadians = function(degrees){
+        return (eval(degrees))*(Math.PI/180);
+    };
+
+    Webgl.prototype.radiansToDegrees = function(radians){
+        return (eval(radians))*(180/Math.PI);
+    };
+
+    Webgl.prototype.toScreenPrepare = function(camera){
+        projScreenMat.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+    };
+
+    Webgl.prototype.toScreenXY = function(position) {
+        var pos = position.clone();
+        this.projScreenMat.multiplyVector3( pos );
+        return pos;
+
+    };
+
+    //pass the event handling to proper stage
+    Webgl.prototype.onEvent = function(){
+        var self = this;
+        return function(event, delta) {
+            self.currentStage.onEvent(event, delta);
+        };
+        
+    };
+
+    Webgl.prototype.getViewport = function() {
+        return this._$viewport;
+    };
+
+})();

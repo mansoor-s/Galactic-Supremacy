@@ -1,64 +1,88 @@
 dummyData = {
     star: {
         type: "g",
-        size: 1.9
+        size: 10,
+        map: "star0"
     },
     planets: [
     {
         name: "SOL1",
         type: "terran",
-        distance: 5,
-        size: 1.5,
-        map: "terran1",
-        orbit:0.1,
+        distance: 2,
+        size: 1.75,
+        map: "terran0",
+        orbit: 0.3,
         moons: [
         {
             name: "mooon1",
             type: "barren",
-            orbit:0,
-            map: "barren1"
+            orbit: 0,
+            map: "barren0"
         }
         ]
     },
     {
         name: "SOL2",
-        type: "volcanic",
-        distance: 10,
+        type: "terran",
+        distance: 3,
         size: 0.8,
-        map: "volcanic3",
+        map: "volcanic0",
         orbit:0.5,
         moons: [
-    ]
+        ]
     },
 		
     {
         name: "SOL1",
         type: "gasgiant",
-        distance: 20,
+        distance: 5,
         size: 4.5,
-        map: "gass5",
-        orbit:0.8,
+        map: "gas0",
+        orbit: 1,
         moons: [
         {
             name: "mooon1",
-            orbit:0.66,
+            orbit: 0.36,
             type: "barren",
-            map: "barren2"
+            map: "barren0"
         },
         {
             name: "moon2",
-            orbit:0.63,
+            orbit: 2.0,
             type: "ice",
-            map: "ice3"
+            map: "ice0"
         },
         {
             name: "moon3",
-            orbit:0.6,
+            orbit: .61,
             type: "desert",
-            map: "desert1"
+            map: "barren0"
+        }
+        ]
+    },
+    {
+        name: "SOL1",
+        type: "gasgiant",
+        distance: 6,
+        size: 3.5,
+        map: "gas1",
+        orbit: .6,
+        moons: [
+        {
+            name: "mooon1",
+            orbit:0.36,
+            type: "barren",
+            map: "barren0"
+        },
+        {
+            name: "moon3",
+            orbit:1.1,
+            type: "desert",
+            map: "barren0"
         }
         ]
     }
+
     ],
     astroids: [
     {

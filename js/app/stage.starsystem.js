@@ -17,9 +17,12 @@
         
         
         //keeps the intersected object for now
-        this.selector;
-        this.SELECTED;
+        this.SELECTED = [];
         this.rotationMatrix = new THREE.Matrix4();
+        
+        //ships and planets arrays
+        this.ships = [];
+        this.planets = [];
         
         //camera control
         this.cameraRotations;
@@ -39,8 +42,6 @@
         // Initialize camera
         this.camera = new THREE.PerspectiveCamera( 45, $viewport.width() / $viewport.height(), 1, 999999 );
       
-        this.camera.matrixAutoUpdate = true;
-        
         this.cameraLookTarget = new THREE.Vector3(0,0,0);
         this.cameraRotations = new THREE.Vector3(45,0,0);
 
@@ -56,11 +57,22 @@
         this._initializeLights();
         this._initializeMaterials();
         this._initializeGeometry();
+        this._initializeHelpers();
+        //selectors and interaction helpers
+     
+       
       
         this.createSystem(systemData);
    
     };
+    StarSystem.prototype._initializeHelpers = function(){
+        this.planetSelector = new THREE.Mesh( THREE.GeometryUtils.clone(this.meshes['sphere']), this.materials.etc.selector );
+        this.planetSelector.visible = false;
+        this.scene.add(this.planetSelector);
+       
+     
     
+    } 
     StarSystem.prototype._initializeGeometry = function(){
         this.meshes.sphere = new THREE.SphereGeometry( 1, 64, 62 );
         this.meshes.sphere.castShadow = true;
@@ -99,11 +111,11 @@
     };
 
     StarSystem.prototype.createSystem = function(data) {
+         
+        
+        
         //adding solar objects
         var star = new THREE.Mesh( THREE.GeometryUtils.clone(this.meshes['sphere']),this. materials.stars[data.star.map] );
-        this.selector = new THREE.Mesh( THREE.GeometryUtils.clone(this.meshes['sphere']), this.materials.etc.selector );
-        this.scene.add(this.selector);
-        this.selector.visible = false;
         //since default size of the meshes is 1 ..we just multiply
         //it by the size of the object
         star.scale.multiplyScalar(data.star.size * 30);
@@ -132,17 +144,17 @@
                 data: data.planets[i],
                 parent: this.scene
             }
-            this.scene.add( planet );
             //adding orbit lines
-            var grid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.grid)
+            var grid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.gridDefault)
             grid.rotation.x = degreesToRadians(90);
             grid.scale.multiplyScalar(data.planets[i].distance * 600 + 400)
      
             grid.tag = {
                 parent: this.scene
             }
-       
+            this.scene.add( planet );
             this.scene.add(grid);
+            this.planets.push(planet);
             for(var i2 = 0; i2 < data.planets[i].moons.length; i2++){
                 var moon = new THREE.Mesh( THREE.GeometryUtils.clone(this.meshes['sphere']), 
                     this.materials.moons[data.planets[i].moons[i2].map] );
@@ -160,8 +172,7 @@
                     data: data.planets[i].moons[i2],
                     parent: planet
                 }
-                this.scene.add( moon );
-                grid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.grid);
+                grid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.gridDefault);
                 grid.rotation.x = degreesToRadians(90);
                 //distance from planet
                 grid.scale.multiplyScalar((i2 * 200) + 400 + data.planets[i].size)
@@ -169,11 +180,65 @@
                 grid.tag = {
                     parent: this.scene
                 }
-       
+                this.scene.add( moon );
+                this.planets.push(moon);
                 this.scene.add(grid);
             }
         }
     };
+    StarSystem.prototype._createShipAnchor = function(ship){
+        //circle under the ship
+        var shipCircle  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.gridDefault)
+        shipCircle.position.set(ship.position.x, 0, ship.position.z);
+        shipCircle.rotation.x = degreesToRadians(90);
+        shipCircle.scale = ship.scale.clone();
+        shipCircle.scale.multiplyScalar(ship.geometry.boundingSphere.radius);
+          
+        //line between y=0 and the ship
+        var shipAnchorGeometry = new THREE.Geometry();
+        shipAnchorGeometry.vertices.push( new THREE.Vertex(new THREE.Vector3( 0, 0, 0)));
+        shipAnchorGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 1, 0)));
+        var shipAnchor = new THREE.Line(shipAnchorGeometry,this.materials.etc.gridDefault)
+        shipAnchor.position.set(ship.position.x,ship.position.y, ship.position.z);
+        shipAnchor.scale.multiplyScalar( -ship.position.y);
+        
+        //future position circle
+        var futureCircle  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.gridDefault)
+        futureCircle.rotation.x = degreesToRadians(90);
+        futureCircle.scale = shipCircle.scale;
+        futureCircle.visible = false;
+        
+        //future position line between y=0 and the ship
+        var futureAnchor = new THREE.Line(shipAnchorGeometry,this.materials.etc.gridDefault)
+        futureAnchor.scale.multiplyScalar( -ship.position.y);
+        futureAnchor.visible = false;
+        
+        
+        //a line between current and future ship positions
+         var connectingGeometry = new THREE.Geometry();
+        connectingGeometry.vertices.push( new THREE.Vertex(new THREE.Vector3()));
+        connectingGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3()));
+        connectingGeometry.dynamic = true;
+        
+        var connectingLine = new THREE.Line(connectingGeometry,this.materials.etc.gridDefault)
+        connectingLine.visible = false;
+        
+        ship.tag.shipCircle = shipCircle;
+        ship.tag.shipAnchor = shipAnchor;
+        ship.tag.futureCircle = futureCircle;
+        ship.tag.futureAnchor = futureAnchor;
+        ship.tag.connectingLine = connectingLine;
+        
+        this.scene.add(connectingLine);
+        this.scene.add(shipCircle);
+        this.scene.add(shipAnchor);
+        this.scene.add(futureCircle);
+        this.scene.add(futureAnchor);
+        
+        
+         
+    };
+    
     StarSystem.prototype.createShips = function(data){
         var material = new THREE.MeshFaceMaterial();
         for(var i = 0;i<data.ships.length;i++){
@@ -181,24 +246,14 @@
             ship.position.set(data.ships[i].position.x, data.ships[i].position.y, data.ships[i].position.z);
             ship.rotation.set(data.ships[i].rotation.x, data.ships[i].rotation.y, data.ships[i].rotation.z);
             ship.scale.set(2,2,2);
-            
-            this.scene.add(ship);
-            var shipGrid  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.grid)
-            shipGrid.position.set(data.ships[i].position.x, data.ships[i].position.y, data.ships[i].position.z);
-            shipGrid.rotation.x = degreesToRadians(90);
-            shipGrid.scale = ship.scale.clone();
-            shipGrid.scale.multiplyScalar(this.meshes.ships[data.ships[i].type].boundingSphere.radius);
-            
+        
             ship.tag = {
                 parent: this.scene,
-                data:data.ships[i],
-                grid:shipGrid
+                data:data.ships[i]
             }
-            shipGrid.tag = {
-                parent: ship
-            };
-            this.scene.add(shipGrid);
-            
+            this.scene.add(ship);
+                this._createShipAnchor(ship)
+            this.ships.push(ship)
             
         }
     }
@@ -241,15 +296,42 @@
     }
     
     StarSystem.prototype.selectPlanet= function(planetObject){
-        
+        this.planetSelector.position = planetObject.position.clone();
+        var size = planetObject.scale.clone();
+        size.multiplyScalar(1.01);
+        this.planetSelector.scale = size;
+        this.SELECTED.push(planetObject);
+        this.planetSelector.visible = true;
+        new TWEEN.Tween( this.cameraLookTarget )
+        .to(planetObject.position, 1500 )
+        .start()
     }
     StarSystem.prototype.deselectPlanet= function(planetObject){
-        
+        this.planetSelector.visible = false;
     }
     StarSystem.prototype.selectShip= function(shipObject){
-        
+        this.SELECTED.push(shipObject);
+        shipObject.tag.shipCircle.material = this.materials.etc.gridSelected;
+        shipObject.tag.shipAnchor.material = this.materials.etc.gridSelected;
+        new TWEEN.Tween( this.cameraLookTarget )
+        .to(shipObject.position, 1500 )
+        .start()
     }
     StarSystem.prototype.deselectShip= function(shipObject){
+        shipObject.tag.shipCircle.material = this.materials.etc.gridDefault;
+        shipObject.tag.shipAnchor.material = this.materials.etc.gridDefault;
+        
+    }
+    
+    StarSystem.prototype.deselectAll = function(){
+        for(var i = 0;i<this.SELECTED.length;i++){
+            if($.inArray(this.SELECTED[i], this.planets)!== -1){
+                this.deselectPlanet(this.SELECTED[i]);
+            }else if ($.inArray(this.SELECTED[i], this.ships)!== -1){
+                this.deselectShip(this.SELECTED[i]);
+            }
+        }
+        this.SELECTED = [];
         
     }
     StarSystem.prototype.onMouseClick = function(event){
@@ -258,32 +340,20 @@
         this._controller.projector.unprojectVector( vector, this.camera );
         //use three.ray to find intersecting geometry
         var ray = new THREE.Ray( this.camera.position, vector.subSelf( this.camera.position ).normalize() );
-
         var intersects = ray.intersectScene( this.scene );
+        
         if ( intersects.length > 0 ) {
             if ( this.SELECTED != intersects[ 0 ].object ) {
-                this.selector.position = intersects[ 0 ].object.position.clone();
-                var size = new THREE.Vector3;
-                size = intersects[ 0 ].object.scale.clone();
-                size.x += 0.1;
-                size.y += 0.1;
-                size.z += 0.1;
-                this.selector.scale = size;
-                this.SELECTED = intersects[ 0 ].object;
-                this.selector.visible = true;
-                new TWEEN.Tween( this.cameraLookTarget )
-                .to(intersects[ 0 ].object.position, 1500 )
-                .start()
-            //todo need to rework the whole intersection business
-            // if (this.SELECTED.tag.object.substr(0,4) === 'ship'){
-            //      this.SELECTED.tag.grid.material = this.materials.etc.grid2;
-            // }
+                if($.inArray(intersects[ 0 ].object, this.planets) !== -1){
+                    this.deselectAll();
+                    this.selectPlanet(intersects[ 0 ].object);
+                }else if($.inArray(intersects[ 0 ].object, this.ships) !== -1) {
+                    this.deselectAll();
+                    this.selectShip(intersects[ 0 ].object);
+                }
             }
-
         } else {
-            this.SELECTED = null;
-            this.selector.visible = false;
-            this.selector.position = this.scene.position.clone()
+            this.deselectAll();
         }
     };
 

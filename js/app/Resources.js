@@ -58,20 +58,20 @@
 
             };
 
+
             this.textures.etc = {
                 torus: this.imageTexture(undefined, {
                     ambient: 0x008888, 
                     color: 0x00ffff
                 }),
-                grid: this.lineTexture({
+                gridDefault: this.lineTexture({
                     color: 0x293A45, 
-                    opacity: 0.9, 
-                    smooth: true
+                    opacity: 0.9
                 }), 
-                grid2: this.lineTexture({
+                
+                gridSelected: this.lineTexture({
                     color: 0xff0000, 
-                    opacity: 0.9, 
-                    smooth: true
+                    opacity: 0.9
                 }),
                 wireframe: this.basicTexture({
                     color: 0x293A45, 

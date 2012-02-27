@@ -1,10 +1,8 @@
 (function() {
     "use strict";
     var Fighter = App.Units.Ships.Fighter = function(){
-    
+        this.launched = false;
     }  
-    Fighter.prototype = new App.Units.Ships.Base;
-    Fighter.prototype.constructor = Fighter;
-    Fighter.prototype.parent = App.Units.Ships.Base.prototype;
-   
+    Fighter.inheritsFrom(App.Units.Ships.Base);
+  
 })

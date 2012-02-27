@@ -5,4 +5,10 @@
     
     
     }
+    Turret.prototype.aimAt = function(target){
+        
+    }
+    Turret.prototype.fireAt = function(target){
+        
+    }
 })

@@ -37,4 +37,4 @@ More documentation
 
 
 ##Licence##
-This project is released under the terms and conditions of the GPL v3 licence.
+This project is released under the terms and conditions of the (AGPL) GNU AFFERO GENERAL PUBLIC LICENSE.

@@ -1,6 +1,7 @@
+//static data for ships
 shipStats = {
     frigates:{
-        frigate1:{
+        cruiser:{
             hullCoeficent:1,
             shieldsCoeficent:1,
             speed:10,

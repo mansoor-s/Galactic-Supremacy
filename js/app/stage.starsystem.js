@@ -51,49 +51,26 @@
         // Create scene
         this.scene = new THREE.Scene();
 
-        
-        
-        //initialize postprocessing
-        //renderModel = new THREE.RenderPass( scene, camera );
-        //composer = new THREE.EffectComposer( controller.renderer );
-        //composer.passes = [renderModel, filmPass, effectScreen];
+        //todo move this line to a preloader
+        App.Resources.initialize();
+
         this._initializeLights();
-        this._initializeMaterials();
-        this._initializeGeometry();
         this._initializeHelpers();
         //selectors and interaction helpers
      
        
       
-        this.createSystem(systemData);
+        this.loadSystem(systemData);
+        this.loadShips(systemData);
    
     };
+    
     StarSystem.prototype._initializeHelpers = function(){
-        this.planetSelector = new THREE.Mesh( THREE.GeometryUtils.clone(this.meshes['sphere']), this.materials.etc.selector );
+        this.planetSelector = new THREE.Mesh( App.Resources.geometries.sphere, App.Resources.materials.etc.selector );
         this.planetSelector.visible = false;
         this.scene.add(this.planetSelector);
-       
-     
-    
     } 
-    StarSystem.prototype._initializeGeometry = function(){
-       
-        //todo... move to resource loader   
-        this.meshes.ships = {}
-        var loader = new THREE.JSONLoader();
-        loader.load( './models/Shipyard.js', $.proxy(function(geometry ) {
-            geometry.computeBoundingSphere();
-            this.meshes.ships['cruiser'] = geometry;
-            this.createShips(systemData);
-        },this) );
-    };
-
-    StarSystem.prototype._initializeMaterials = function(){
-        //initialized all materials
-        App.Resources.initializeMaterials();
-        this.materials = App.Resources.materials;
-    },
-
+    
     StarSystem.prototype._initializeLights = function(){
         var ambient = new THREE.AmbientLight( 0xffffff ); 
         this.scene.add( ambient );
@@ -104,7 +81,7 @@
         this.scene.add(pointLight);
     };
 
-    StarSystem.prototype.createSystem = function(data) {
+    StarSystem.prototype.loadSystem = function(data) {
          
         
         
@@ -181,20 +158,8 @@
         }
     };
     StarSystem.prototype.loadShips = function(data){
-        var material = new THREE.MeshFaceMaterial();
-        for(var i = 0;i<data.ships.length;i++){
-            var ship = new THREE.Mesh(this.meshes.ships[data.ships[i].type],material);
-            ship.position.set(data.ships[i].position.x, data.ships[i].position.y, data.ships[i].position.z);
-            ship.rotation.set(data.ships[i].rotation.x, data.ships[i].rotation.y, data.ships[i].rotation.z);
-            ship.scale.set(2,2,2);
-        
-            ship.tag = {
-                parent: this.scene,
-                data:data.ships[i]
-            }
-            this.scene.add(ship);
-            this._createShipAnchor(ship)
-            this.ships.push(ship)
+       for(var i = 0;i<data.ships.length;i++){
+           
             
         }
     }

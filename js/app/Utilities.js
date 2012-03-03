@@ -12,14 +12,14 @@ Function.prototype.inheritsFrom = function( parentClassOrObject ){
         //Normal Inheritance 
         this.prototype = new parentClassOrObject;
         this.prototype.constructor = this;
-        this.prototype.parent = parentClassOrObject.prototype;
+        this.prototype.parentClass = parentClassOrObject.prototype;
     } 
     else 
     { 
         //Pure Virtual Inheritance 
         this.prototype = parentClassOrObject;
         this.prototype.constructor = this;
-        this.prototype.parent = parentClassOrObject;
+        this.prototype.parentClass = parentClassOrObject;
     } 
     return this;
 } 

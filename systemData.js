@@ -1,3 +1,4 @@
+//data retrieved from server for each system
 systemData = {
     star: {
         type: "g",

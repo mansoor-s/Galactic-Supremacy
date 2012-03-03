@@ -23,7 +23,7 @@
             this.pool.push(instance);
             instance.onReturnToPool();//todo not sure if this will be here
         } else{
-            alert('the inUse doesnt have this instance'); 
+            alert('error:the inUse doesnt have this instance'); 
         }
     }
     Pool.prototype.freeAll = function(){

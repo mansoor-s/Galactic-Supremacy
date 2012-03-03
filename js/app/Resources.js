@@ -21,7 +21,7 @@
             return new THREE.MeshBasicMaterial(options);
         }
     
-        this.initilizeGeometries  = function(){
+        this._initilizeGeometries  = function(){
             this.geometries.sphere = new THREE.SphereGeometry( 1, 64, 62 );
             this.geometries.sphere.castShadow = true;
             this.geometries.sphere.receiveShadow = true;
@@ -35,8 +35,23 @@
             this.geometries.verticalLine.vertices.push( new THREE.Vertex(new THREE.Vector3( 0, 0, 0)));
             this.geometries.verticalLine.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 1, 0)));
         
+        
+            //todo correct it becouse its asynch
+            this.geometries.ships = {}
+            var loader = new THREE.JSONLoader();
+            loader.load( './models/Shipyard.js', $.proxy(function(geometry ) {
+                geometry.computeBoundingSphere();
+                this.geometries.ships['cruiser'] = geometry;
+            },this) );
+        
         }    
-        this.initializeMaterials = function() {
+        
+        this.initialize = function(){
+            this._initializeMaterials();
+            this._initializeGeometries();
+        }
+        
+        this._initializeMaterials = function() {
             this.materials.planets = {
                 gas0: this.imageMaterial("jupiter.jpg", {
                     overdraw: true
@@ -91,7 +106,8 @@
                     overdraw: true, 
                     doubleSided: true,
                     map: THREE.ImageUtils.loadTexture( 'images/textures/selector.png' )
-                })
+                }),
+                meshFace: new THREE.MeshFaceMaterial()
             };   
         
         } 

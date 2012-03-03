@@ -17,4 +17,4 @@
     Turret.prototype.update = function(){
         
     }
-})
+})();

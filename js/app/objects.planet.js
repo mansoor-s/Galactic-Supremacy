@@ -3,7 +3,7 @@
     var Planet = App.Objects.Planet = function(){
         this.mesh = null;
         this.scene = null;
-        this.position = new THREE.Vector3();
+        this.position;
         this.grid;
         this._createGrid();
         this.population;
@@ -19,12 +19,44 @@
     //loads on system load
     Planet.prototype._createGrid = function(){
         //todo use resources.
-        this.grid.circle  = new THREE.Line( App.Resources.geometries.circle, App.Resources.materials.etc.gridDefault )
+        this.grid  = new THREE.Line( App.Resources.geometries.circle, App.Resources.materials.etc.gridDefault )
         //  this._grid.circle.position.set(ship.position.x, 0, ship.position.z);
-        this.grid.circle.rotation.x = degreesToRadians(90);
+        this.grid.rotation.x = degreesToRadians(90);
     }
-    Planet.prototype.load = function(data,scene){
+    Planet.prototype.load = function(data,scene,parent){
         this.scene = scene;
+        if(parent === undefined){
+            parent = {
+                position:{
+                    x:0,
+                    y:0,
+                    z:0
+                },
+                size:0             
+            };          
+            this.size = data.size;
+        }else{
+            //when parent is defined its a moon
+            this.size = data.size = 100;
+        }
+        this.mesh = new THREE.Mesh( App.Resources.geometries.sphere, 
+            App.Resources.materials.planets[data.map] );
+        this.position = this.mesh.position;
+       
+        this.mesh.scale.multiplyScalar(data.size);
+        //set the position.and then rotate it...
+        this.mesh.position.set(1,0,0).multiplyScalar(data.distance + parent.size);
+            
+        App.Resources.misc.rotationMatrix.setRotationY(degreesToRadians(360 * data.orbit));
+        App.Resources.misc.rotationMatrix.multiplyVector3(this.mesh.position);
+            
+      this.mesh.position.addSelf(parent.position);
+                
+        
+        //adding orbit lines
+        this.grid.scale.multiplyScalar(data.distance + parent.size)
+        this.grid.position = parent.position;
+
         
         
         
@@ -50,4 +82,4 @@
             this.scene = null;
         }
     }
-})
+})();

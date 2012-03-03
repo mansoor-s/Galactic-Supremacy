@@ -5,4 +5,4 @@
     }  
     Frigate.inheritsFrom(App.Units.Ships.Base);
   
-})
+})();

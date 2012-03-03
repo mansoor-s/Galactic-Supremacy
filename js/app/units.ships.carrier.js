@@ -14,4 +14,4 @@
     Carrier.prototype.recallFighters = function(){
        
     }
-})
+})();

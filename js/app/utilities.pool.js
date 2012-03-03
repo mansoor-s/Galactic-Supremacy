@@ -1,6 +1,6 @@
-(function(){
-  
-    var Pool = App.Utilities.Pool = function(instanceClass){
+(function() {
+    "use strict"
+    var Pool = App.Utilities.Pool = function(instanceClass) {
         this.instanceClass = instanceClass;
         this.pool = [];
         this.inUse = [];
@@ -39,4 +39,4 @@
         return newInstance;
     }
  
-})
+})();

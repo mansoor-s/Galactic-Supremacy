@@ -23,3 +23,15 @@ Function.prototype.inheritsFrom = function( parentClassOrObject ){
     } 
     return this;
 } 
+//prepares a matrix for the postoscreen function
+function posToScreenPrepare(camera){
+    var matrix = new THREE.Matrix4();
+   return matrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+};
+//pos to screen returns a {x,y} value from -1 to 1,
+//0 being the center of the viewport
+function posToScreen(position,matrix) {
+    var pos = position.clone();
+    matrix.multiplyVector3( pos );
+    return pos;
+};

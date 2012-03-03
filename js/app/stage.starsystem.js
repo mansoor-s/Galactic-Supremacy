@@ -40,10 +40,10 @@
             'mousemove': 'onMouseMove'
         };
         
-        var $viewport = this._controller.getViewport();
+        this._$viewport = this._controller.getViewport();
 
         // Initialize camera
-        this.camera = new THREE.PerspectiveCamera( 45, $viewport.width() / $viewport.height(), 1, 999999 );
+        this.camera = new THREE.PerspectiveCamera( 45, this._$viewport.width() / this._$viewport.height(), 1, 999999 );
       
         this.cameraLookTarget = new THREE.Vector3(0,0,0);
         this.cameraRotations = new THREE.Vector3(45,0,0);

@@ -11,8 +11,7 @@
         this.FPS = 60,
         this.MAX_FRAME_SKIP = 10,
         this.SKIP_TICKS = 1000 / this.FPS;
-        this.projScreenMat = new THREE.Matrix4();
-
+       
         this.renderer;
         this.projector;
 
@@ -96,18 +95,7 @@
 
         return intersection;
     };
-    Webgl.prototype.toScreenPrepare = function(camera){
-        this.projScreenMat.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
-    };
-
-    Webgl.prototype.toScreenXY = function(position) {
-        var pos = position.clone();
-        this.projScreenMat.multiplyVector3( pos );
-        return pos;
-
-    };
-
-    //pass the event handling to proper stage
+      //pass the event handling to proper stage
     Webgl.prototype.onEvent = function(){
         var self = this;
         return function(event, delta) {

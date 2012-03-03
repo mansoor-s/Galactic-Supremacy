@@ -22,7 +22,10 @@
         
         //ships and planets arrays
         this.ships = [];
-        this.planets = [];
+        this.fighters = new App.Utilities.pool(App.Units.Ships.fighter);
+        this.carriers = new App.Utilities.pool(App.Units.Ships.carrier);
+        this.frigates = new App.Utilities.pool(App.Units.Ships.frigate);
+        this.planets = new App.Utilities.pool(App.Objects.Planet);
         
         //camera control
         this.cameraRotations;
@@ -74,14 +77,7 @@
     
     } 
     StarSystem.prototype._initializeGeometry = function(){
-        this.meshes.sphere = new THREE.SphereGeometry( 1, 64, 62 );
-        this.meshes.sphere.castShadow = true;
-        this.meshes.sphere.receiveShadow = true;
-        this.meshes.torus = new THREE.TorusGeometry(1.2, 0.1, 2, 60)
-        this.shapes['circle'] = new THREE.Shape();
-        this.shapes['circle'].moveTo(0,0);
-        this.shapes['circle'].arc( 0, 0, 1, 0, Math.PI * 2, false );
-        
+       
         //todo... move to resource loader   
         this.meshes.ships = {}
         var loader = new THREE.JSONLoader();
@@ -94,10 +90,8 @@
 
     StarSystem.prototype._initializeMaterials = function(){
         //initialized all materials
-        //todo:add also textured materials
-        var t = App.Resources;
-        t.initialize();
-        this.materials = t.textures;
+        App.Resources.initializeMaterials();
+        this.materials = App.Resources.materials;
     },
 
     StarSystem.prototype._initializeLights = function(){
@@ -186,60 +180,7 @@
             }
         }
     };
-    StarSystem.prototype._createShipAnchor = function(ship){
-        //circle under the ship
-        var shipCircle  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.gridDefault)
-        shipCircle.position.set(ship.position.x, 0, ship.position.z);
-        shipCircle.rotation.x = degreesToRadians(90);
-        shipCircle.scale = ship.scale.clone();
-        shipCircle.scale.multiplyScalar(ship.geometry.boundingSphere.radius);
-          
-        //line between y=0 and the ship
-        var shipAnchorGeometry = new THREE.Geometry();
-        shipAnchorGeometry.vertices.push( new THREE.Vertex(new THREE.Vector3( 0, 0, 0)));
-        shipAnchorGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 1, 0)));
-        var shipAnchor = new THREE.Line(shipAnchorGeometry,this.materials.etc.gridDefault)
-        shipAnchor.position.set(ship.position.x,ship.position.y, ship.position.z);
-        shipAnchor.scale.multiplyScalar( -ship.position.y);
-        
-        //future position circle
-        var futureCircle  = new THREE.Line( this.shapes['circle'].createPointsGeometry(60), this.materials.etc.gridDefault)
-        futureCircle.rotation.x = degreesToRadians(90);
-        futureCircle.scale = shipCircle.scale;
-        futureCircle.visible = false;
-        
-        //future position line between y=0 and the ship
-        var futureAnchor = new THREE.Line(shipAnchorGeometry,this.materials.etc.gridDefault)
-        futureAnchor.scale.multiplyScalar( -ship.position.y);
-        futureAnchor.visible = false;
-        
-        
-        //a line between current and future ship positions
-         var connectingGeometry = new THREE.Geometry();
-        connectingGeometry.vertices.push( new THREE.Vertex(new THREE.Vector3()));
-        connectingGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3()));
-        connectingGeometry.dynamic = true;
-        
-        var connectingLine = new THREE.Line(connectingGeometry,this.materials.etc.gridDefault)
-        connectingLine.visible = false;
-        
-        ship.tag.shipCircle = shipCircle;
-        ship.tag.shipAnchor = shipAnchor;
-        ship.tag.futureCircle = futureCircle;
-        ship.tag.futureAnchor = futureAnchor;
-        ship.tag.connectingLine = connectingLine;
-        
-        this.scene.add(connectingLine);
-        this.scene.add(shipCircle);
-        this.scene.add(shipAnchor);
-        this.scene.add(futureCircle);
-        this.scene.add(futureAnchor);
-        
-        
-         
-    };
-    
-    StarSystem.prototype.createShips = function(data){
+    StarSystem.prototype.loadShips = function(data){
         var material = new THREE.MeshFaceMaterial();
         for(var i = 0;i<data.ships.length;i++){
             var ship = new THREE.Mesh(this.meshes.ships[data.ships[i].type],material);
@@ -252,7 +193,7 @@
                 data:data.ships[i]
             }
             this.scene.add(ship);
-                this._createShipAnchor(ship)
+            this._createShipAnchor(ship)
             this.ships.push(ship)
             
         }

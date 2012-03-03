@@ -15,7 +15,7 @@
         this.owner;
     }
     //loads on system load
-    Planet.prototype.load = function(data){
+    Planet.prototype.load = function(data,scene){
         
     }
     //updates every frame

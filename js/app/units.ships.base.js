@@ -41,7 +41,8 @@
           
         //line between y=0 and the ship
         //todo: move shipAnchorGeometry to common resource loader
-        this._rid.anchor = new THREE.Line(App.Resources.geometries.verticalLine,App.Resources.materials.etc.gridDefault)
+        this.grid.anchor = new THREE.Line(App.Resources.geometries.verticalLine,App.Resources.materials.etc.gridDefault)
+        this.grid.anchor.position = this.grid.circle.position;
         //  shipAnchor.position.set(ship.position.x,ship.position.y, ship.position.z);
         //  shipAnchor.scale.multiplyScalar( -ship.position.y);
         
@@ -78,10 +79,10 @@
         this.rotation = this.mesh.rotation;
         
        
-        //todo calculate grid positions
-      
-           
-       
+        //calculate grid positions
+        this.grid.shipCircle.position.set(data.position.x,0,data.position.z);
+        this.grid.shipAnchor.scale.multiplyScalar(data.position.y);
+               
         scene.add(this.mesh);
         scene.add(this.grid.connectingLine);
         scene.add(this.grid.shipCircle);
@@ -124,4 +125,4 @@
             this.scene = null;
         }
     }
-})
+})();

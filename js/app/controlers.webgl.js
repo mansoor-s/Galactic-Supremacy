@@ -1,7 +1,7 @@
 (function() {
     "use strict";
     var Webgl = App.Controllers.Webgl = function($viewport) {
-        this._$viewport = $viewport;
+        this.$viewport = $viewport;
 
         // Game loop
         this.loops = 0,
@@ -19,28 +19,30 @@
         this.projector = new THREE.Projector();
 
         // Create renderer
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new THREE.WebGLRenderer({
+            antialias:true
+        });
  
-        this.renderer.antialias = true;
+       
         this.renderer.shadowMapEnabled = true;
         this.renderer.setClearColor( 0xff0000, 1 );
         this.renderer.autoClear = false;
-        this.renderer.setSize( this._$viewport.width(), this._$viewport.height() );
+        this.renderer.setSize( this.$viewport.width(), this.$viewport.height() );
 
         // initialize fps counter
         this.stats = new Stats(); 
         this.stats.domElement.style.position = 'absolute';
         this.stats.domElement.style.top = '75px';
         this.stats.domElement.style.right = '0px';
-        this._$viewport.append(this.stats.domElement);
-        this._$viewport.append(this.renderer.domElement);
+        this.$viewport.append(this.stats.domElement);
+        this.$viewport.append(this.renderer.domElement);
 
         //render the current stage
         this.currentStage = new App.Stages.StarSystem(this);
 
 
         //event binding
-        this._$viewport.on('mousedown mouseup mousemove dblclick click mousewheel', this.onEvent());
+        this.$viewport.on('mousedown mouseup mousemove dblclick click mousewheel', this.onEvent());
         $(document).live('keydown keyup keypress', this.onEvent());
 
         this.animate();
@@ -95,7 +97,7 @@
 
         return intersection;
     };
-      //pass the event handling to proper stage
+    //pass the event handling to proper stage
     Webgl.prototype.onEvent = function(){
         var self = this;
         return function(event, delta) {
@@ -103,9 +105,4 @@
         };
         
     };
-
-    Webgl.prototype.getViewport = function() {
-        return this._$viewport;
-    };
-
 })();

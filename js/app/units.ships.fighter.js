@@ -5,4 +5,4 @@
     }  
     Fighter.inheritsFrom(App.Units.Ships.Base);
   
-})
+})();

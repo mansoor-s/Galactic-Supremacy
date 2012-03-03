@@ -3,7 +3,9 @@
     var Resources = App.Resources = new function()  {
         this.materials = {};
         this.geometries = {};
-    
+        this.misc = {};
+        this.misc.rotationMatrix = new THREE.Matrix4();
+       
         
         this.lineMaterial = function( options ) {
             return new THREE.LineBasicMaterial(options);
@@ -21,7 +23,7 @@
             return new THREE.MeshBasicMaterial(options);
         }
     
-        this._initilizeGeometries  = function(){
+        this._initializeGeometries  = function(){
             this.geometries.sphere = new THREE.SphereGeometry( 1, 64, 62 );
             this.geometries.sphere.castShadow = true;
             this.geometries.sphere.receiveShadow = true;
@@ -46,10 +48,8 @@
         
         }    
         
-        this.initialize = function(){
-            this._initializeMaterials();
-            this._initializeGeometries();
-        }
+          
+        
         
         this._initializeMaterials = function() {
             this.materials.planets = {
@@ -67,14 +67,7 @@
                 desert0: this.imageMaterial("desert1.jpg", {
                     ambient: 0x555555, 
                     color: 0x888888
-                }, true)
-            };
-
-            this.materials.moons = {
-                ice0: this.imageMaterial(undefined, {
-                    ambient: 0x05555, 
-                    color: 0x008888
-                }),
+                }, true),
                 barren0: this.imageMaterial("barren1.jpg", {
                     ambient: 0x555555, 
                     color: 0x888888
@@ -82,12 +75,8 @@
             };
 
             this.materials.stars = {
-                star0: this.basicMaterial({
-                    map: THREE.ImageUtils.loadTexture( 'images/textures/main_sequence_body.png' ), 
-                    blending: THREE.AdditiveBlending, 
-                    overdraw: true
-                })
-
+                star0: this.imageMaterial( 'main_sequence_body.png' ,{},true) 
+                
             };
 
 
@@ -101,15 +90,15 @@
                     color: 0xff0000, 
                     opacity: 0.9
                 }),
-                selector: this.basicMaterial({
+                selector: this.imageMaterial("selector.png",{
                     transparent: true, 
                     overdraw: true, 
-                    doubleSided: true,
-                    map: THREE.ImageUtils.loadTexture( 'images/textures/selector.png' )
-                }),
+                    doubleSided: true},true),
                 meshFace: new THREE.MeshFaceMaterial()
             };   
         
         } 
+        this._initializeMaterials();
+        this._initializeGeometries();
     }
-});
+})();

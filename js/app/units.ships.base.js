@@ -71,7 +71,7 @@
         this.scene = scene;
         //todo load appropriate mesh
        
-        this.mesh = new THREE.Mesh(App.Resources.geometries.ships[data.type],App.Resources.materials.etc.meshFace);
+        this.mesh = new THREE.Mesh(App.Resources.geometries.ships[data.subtype],App.Resources.materials.etc.meshFace);
         this.mesh.position.set(data.position.x, data.position.y, data.position.z);
         this.mesh.rotation.set(data.rotation.x, data.rotation.y, data.rotation.z);
         this.position = this.mesh.position;

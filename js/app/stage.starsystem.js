@@ -22,11 +22,11 @@
         
         //ships and planets arrays
         this.ships = [];
-        this.fighters = new App.Utilities.pool(App.Units.Ships.fighter);
-        this.carriers = new App.Utilities.pool(App.Units.Ships.carrier);
-        this.frigates = new App.Utilities.pool(App.Units.Ships.frigate);
-        this.planets = new App.Utilities.pool(App.Objects.Planet);
-        
+        this.fighterPool = new App.Utilities.pool(App.Units.Ships.fighter);
+        this.carrierPool = new App.Utilities.pool(App.Units.Ships.carrier);
+        this.frigatePool = new App.Utilities.pool(App.Units.Ships.frigate);
+        this.planetPool = new App.Utilities.pool(App.Objects.Planet);
+        this.planets = this.planetPool.inUse;
         //camera control
         this.cameraRotations;
         this.cameraLookTarget;
@@ -158,13 +158,17 @@
         }
     };
     StarSystem.prototype.loadShips = function(data){
-       for(var i = 0;i<data.ships.length;i++){
-           
-            
+        this.fighterPool.freeAll();
+        this.frigatePool.freeAll();
+        this.carrierPool.freeAll();
+        
+        for(var i = 0;i<data.ships.length;i++){
+            var ship = this[data.ships[i].type+"Pool"].useOne();
+            ship.load(data.ships[i]);
+            this.ships.push(ship);    
         }
     }
-    StarSystem.prototype.update = function(){
-        //updating camera position depending on controlls
+    StarSystem.prototype.updateCamera = function(){
         var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
         this.rotationMatrix.setRotationX(degreesToRadians(this.cameraRotations.x));
         this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
@@ -178,6 +182,10 @@
         this.camera.position.addSelf(distanceVector);
         
         this.camera.lookAt(this.cameraLookTarget);
+    }
+    StarSystem.prototype.update = function(){
+        //updating camera position depending on controlls
+        this.updateCamera();
         
         TWEEN.update();
     };

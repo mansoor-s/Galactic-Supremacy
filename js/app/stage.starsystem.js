@@ -26,10 +26,6 @@
         this.frigatePool = new App.Utilities.Pool(App.Units.Ships.Frigate);
         this.planetPool = new App.Utilities.Pool(App.Objects.Planet);
         this.planets = this.planetPool.inUse;
-        //camera control
-        this.cameraRotations;
-        this.cameraLookTarget;
-        this.cameraDistance = this.farestCameraPosition;
 
         this.events = {
             'keydown': 'onKeyDown',
@@ -41,9 +37,10 @@
         
         // Initialize camera
         this.camera = new THREE.PerspectiveCamera( 45, this._controller.$viewport.width() / this._controller.$viewport.height(), 1, 999999 );
-      
+        //camera control
         this.cameraLookTarget = new THREE.Vector3(0,0,0);
         this.cameraRotations = new THREE.Vector3(45,0,0);
+        this.cameraDistance = this.farestCameraPosition;
 
         // Create scene
         this.scene = new THREE.Scene();

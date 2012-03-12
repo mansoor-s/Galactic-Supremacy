@@ -1,40 +1,38 @@
 function createStars() {
+    //scale of the galaxy
     var spiralTransformations = {
-        x: .6,//675,
-        y: .6
-    }
-    var zRandomOffsetRange = 1000;
-    var starsPerArm = 5000;
-    var randomOffsetRange = 2000;
-    var A = 4000;
-    xTransform = spiralTransformations.x || .6;  // "scale. higher = more zoomed in"
-    yTransform = spiralTransformations.y || .6;
+        x: .25,//675,
+        y: .25
+    };
+
+    var zRandomOffsetRange = 300;
+    var starsPerArm = 33333;
+    var randomOffsetRange = 500;
+    var A = 6000;
+    var angleIncrament = .005;
+
+     // "scale. higher = more zoomed in" 
+    var xTransform = spiralTransformations.x || .6; 
+    var yTransform = spiralTransformations.y || .6;
     
     var spirals = [
     {
-        xDirection: -1,
-        yDirection: 1,
-        xAngle: 30,
-        yAngle: 30
-    },
-    {
         xDirection: 1,
-        yDirection: -1,
-        xAngle: -30,
-        yAngle: -30
-    },
-        
-    {
-        xDirection: -1,
         yDirection: 1,
         xAngle: 0,
         yAngle: 0
     },
     {
         xDirection: 1,
-        yDirection: -1,
-        xAngle: 0,
-        yAngle: 0
+        yDirection: 1,
+        xAngle: 90,
+        yAngle: 90
+    },
+    {
+        xDirection: 1,
+        yDirection: 1,
+        xAngle: 45,
+        yAngle: 45
     }
 	
     ];
@@ -43,6 +41,7 @@ function createStars() {
     var stars = [];
     
     var spiralOdd = true;
+    var noise = new SimplexNoise();
     for (var i = 0; i < spirals.length; i++) {
         var a = A;
         var spiral = spirals[i];
@@ -50,10 +49,14 @@ function createStars() {
         var xAngle = spiral.xAngle >>> 0;
         var yAngle = spiral.yAngle >>> 0;
         
-        var s = 0;
+        //s = distance from teh last star  on the spiral curve
+        var s = 500;
         var odd = true;
         for (var j = 0; j < starsPerArm; j++) {
-            a += .01;
+            //angle incrament
+            a += angleIncrament;
+            //var noiseFactor = noise.noise(j, a)
+            //a += noiseFactor * 5;
             var t = f_inv(a, s);
             var x = calc_x(a, t, xTransform);
             var y = calc_y(a, t, yTransform);
@@ -62,29 +65,32 @@ function createStars() {
             x = rotateX(x, y, xAngle);
             y = yTemp;
                 
-            var left, top;
             if (spiralOdd) {
-                left = x + middleBiasedRand(randomOffsetRange);
-                top = -y + middleBiasedRand(randomOffsetRange);
+                y = -y;
                 spiralOdd = false
             } else {
-                left = -x + middleBiasedRand(randomOffsetRange);
-                top = y + middleBiasedRand(randomOffsetRange);
-					
+                x = -x;
                 spiralOdd = true;
             }
 				
-            var depth = middleBiasedRand(zRandomOffsetRange);
-				
+            var z = middleBiasedRand(zRandomOffsetRange);
+            x += middleBiasedRand(randomOffsetRange);
+            y += middleBiasedRand(randomOffsetRange);
+
+            var NoiseFactor3d = noise.noise3d(x / 1000, y / 1000, z / 1000) * 80;
+            x += NoiseFactor3d;
+            y += NoiseFactor3d;
+            z += NoiseFactor3d;
+			
             stars.push({
-                x: left,
-                y: depth,
-                z: top,
-                name: 'x'+ left + 'y' + depth + 'z' + top,
+                x: x,
+                y: y,
+                z: z,
+                name: 'x'+ x + 'y' + y + 'z' + z,
                 type: starType()
             });
                 
-            s += 1;
+            s += .5;
         }
         
     }
@@ -181,97 +187,4 @@ function rotateX(x, y, angle) {
 function rotateY(x, y, angle) {
     //ynew = y * cos(angle) + x * sin(angle)
     return y * Math.cos(angle) + x * Math.sin(angle);
-}
-
-
-
-function createDust() {
-    var spiralTransformations = {
-        x: .6,//675,
-        y: .6
-    }
-    var zRandomOffsetRange = 80;
-    var starsPerArm = 1000;
-    var randomOffsetRange = 500;
-    var A = 4000;
-    xTransform = spiralTransformations.x || .6;  // "scale. higher = more zoomed in"
-    yTransform = spiralTransformations.y || .6;
-    
-    var spirals = [
-    {
-        xDirection: -1,
-        yDirection: 1,
-        xAngle: 30,
-        yAngle: 30
-    },
-    {
-        xDirection: 1,
-        yDirection: -1,
-        xAngle: -30,
-        yAngle: -30
-    },
-        
-    {
-        xDirection: -1,
-        yDirection: 1,
-        xAngle: 0,
-        yAngle: 0
-    },
-    {
-        xDirection: 1,
-        yDirection: -1,
-        xAngle: 0,
-        yAngle: 0
-    }
-	
-    ];
-    
-    var a = A;
-    var dusts = [];
-    
-    var spiralOdd = true;
-    for (var i = 0; i < spirals.length; i++) {
-        var spiral = spirals[i];
-        
-        var xAngle = spiral.xAngle >>> 0;
-        var yAngle = spiral.yAngle >>> 0;
-        
-        var s = 0;
-        var odd = true;
-        for (var j = 0; j < starsPerArm; j++) {
-            var t = f_inv(a, s);
-            var x = calc_x(a, t, xTransform);
-            var y = calc_y(a, t, yTransform);
-                
-            var yTemp = rotateY(x, y, yAngle);
-            x = rotateX(x, y, xAngle);
-            y = yTemp;
-                
-            var left, top;
-            if (spiralOdd) {
-                left = x + middleBiasedRand(randomOffsetRange);
-                top = -y + middleBiasedRand(randomOffsetRange);
-                spiralOdd = false
-            } else {
-                left = -x + middleBiasedRand(randomOffsetRange);
-                top = y + middleBiasedRand(randomOffsetRange);
-					
-                spiralOdd = true;
-            }
-				
-            var depth = middleBiasedRand(zRandomOffsetRange);
-				
-            dusts.push({
-                x: left,
-                y: depth,
-                z: top,
-                type: starType()
-            });
-                
-            s += 10;
-        }
-        
-    }
-    
-    return stars;
 }

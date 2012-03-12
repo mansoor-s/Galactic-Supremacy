@@ -38,9 +38,9 @@
         this.$viewport.append(this.renderer.domElement);
 
         //render the current stage
-        this.currentStage = new App.Stages.StarSystem(this);
+        //this.currentStage = new App.Stages.StarSystem(this);
 
-        //this.currentStage = new App.Stages.Galaxy(this);
+        this.currentStage = new App.Stages.Galaxy(this);
 
         //event binding
         this.$viewport.on('mousedown mouseup mousemove dblclick click mousewheel', this.onEvent());

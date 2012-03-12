@@ -10,7 +10,7 @@
         //the levels of zoom
         this.zoomLevelCurrent = 0;//
         this.zoomLevelCount = 37; 
-        this.starSize = 5;
+        this.starSize = 2;
 
         //flag for when the CTRL key is pressed
         this.ctrPressed = false;
@@ -27,7 +27,7 @@
             y: 0
         };
 
-        this.filmPass = new THREE.BloomPass(2.5, 25, 4.0);
+        this.filmPass = new THREE.BloomPass(1.25, 25, 3.5);
         this.effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
         this.effectScreen.renderToScreen = true;
 
@@ -37,9 +37,8 @@
         //********* MAKE GETTER FUNCTION FOR THESE!!
         //camera controls ,,,have to be public for the transition between 
         //galaxy and system view
-        this.cameraLookTarget = new THREE.Vector3(0, 0, 0),
+        this.cameraLookTarget = new THREE.Vector3(0, 0, 0);
         
-        this.cameraRotations = new THREE.Vector3(0, 0, 0),
 
 
         this.controller = webglController;
@@ -48,24 +47,25 @@
             
         // Initialize camera
         this.camera = new THREE.PerspectiveCamera( 45, this.controller.$viewport.width() / this.controller.$viewport.height(), 1, 90000 );
-            
+        this.cameraRotations = new THREE.Vector3(0, 0, 0); 
+
         this.camera.matrixAutoUpdate = true;
-            
+        
         this.cameraDistance = this.farestCameraPosition;
         // Create scene
         this.scene = new THREE.Scene();
 
         var starColors = [
-            '0x293a45',
-            '0x293a45',
-            '0x6f90a1',
-            '0x677FB5',
-            '0x293a45',
-            '0x2D2DB3',
-            '0x6f90a1',
-            '0x677FB5',
-            '0x6f90a1',
-            '0x6f90a1'
+            '0x97aaf7',
+            '0xffffff',
+            '0x6656FC',
+            '0x8FB2E3',
+            '0xfbf8ff',
+            '0x004AC2',
+            '0x005E99',
+            '0x005E99',
+            '0x6656FC',
+            '0x005E99'
         ];
 
         //setup DOM event handlers
@@ -78,11 +78,13 @@
         };
 
         // create geometry for the particle system  and add vertices to it
+        //console.log(starColors[this.starlist[10].type]);
+        //console.log(starColors[this.starlist[33].type]);
         this.galaxyGeometry = new THREE.Geometry();
         for ( var i = 0; i < this.starlist.length; i ++ ) {
             var vector = new THREE.Vector3( this.starlist[i].x, this.starlist[i].y, this.starlist[i].z );
             this.galaxyGeometry.vertices.push( new THREE.Vertex( vector ) );
-            this.galaxyGeometry.colors[i] = new THREE.Color( starColors[0]);
+            this.galaxyGeometry.colors[i] = new THREE.Color( starColors[this.starlist[i].type]);
         }
 
         var starMaterial = new THREE.ParticleBasicMaterial( { 
@@ -91,11 +93,11 @@
             vertexColors: true,
             //blending:THREE.AdditiveBlending,
             //             depthTest:false,
-            alphaTest: .5
+            alphaTest: .9
         } );
 
         //declare particle system with material 0
-        this.particleSystem = new THREE.ParticleSystem( this.galaxyGeometry, this.starMaterial );
+        this.particleSystem = new THREE.ParticleSystem( this.galaxyGeometry, starMaterial );
         this.particleSystem.dynamic = true;
 
 
@@ -111,9 +113,14 @@
     Galaxy.prototype.update = function() {
         //updating camera position depending on controlls
         var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
+        
         this.rotationMatrix.setRotationX(App.Utill.degreesToRadians(this.cameraRotations.x));
         this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
-        this.rotationMatrix.setRotationY(App.Utill.degreesToRadians(this.cameraRotations.y));
+        
+        //this.rotationMatrix.setRotationY(App.Utill.degreesToRadians(this.cameraRotations.y));
+        //this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
+
+        this.rotationMatrix.setRotationZ(App.Utill.degreesToRadians(this.cameraRotations.z));
         this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
         
         this.camera.position.x = this.cameraLookTarget.x;
@@ -144,6 +151,8 @@
 
 
     Galaxy.prototype.onKeyDown = function(e) {
+        var turnUnits = 1;
+
         if (e.keyCode === 17) {
             this.ctrMouse.initX = this.currentMouse.x;
             this.ctrMouse.initY = this.currentMouse.y;
@@ -151,22 +160,22 @@
 
         //left
         }else if (e.keyCode === 37) {
-            this.cameraRotations.y -= .5
+            this.cameraRotations.z -= turnUnits;
         //right
         }else if (e.keyCode === 39) {
-            this.cameraRotations.y += .5
+            this.cameraRotations.z += turnUnits;
         //up
         }else if (e.keyCode === 38) {
-            this.cameraRotations.x += .5
+            this.cameraRotations.x += turnUnits;
         //down
         }else if (e.keyCode === 40) {
-            this.cameraRotations.x -= .5
+            this.cameraRotations.x -= turnUnits;
         //add
         }else if (e.keyCode === 107) {
-            this.cameraDistance -=1;
+            this.cameraDistance -=100;
         //subtract
         }else if (e.keyCode === 109) {
-            this.cameraDistance +=1;
+            this.cameraDistance +=100;
         }
     };
 

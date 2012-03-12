@@ -38,8 +38,9 @@
         this.$viewport.append(this.renderer.domElement);
 
         //render the current stage
-        this.currentStage = new App.Stages.StarSystem(this);
+        //this.currentStage = new App.Stages.StarSystem(this);
 
+        this.currentStage = new App.Stages.Galaxy(this);
 
         //event binding
         this.$viewport.on('mousedown mouseup mousemove dblclick click mousewheel', this.onEvent());
@@ -83,7 +84,7 @@
         this.currentStage.render();
     };
 
-    //gets position in the z plane of a givvent mouse coordinates
+    //gets position in the z plane of a givent mouse coordinates
     Webgl.prototype.getIntersectionWithYPlane = function(camera, mouse, y) {
         var vector = new THREE.Vector3( mouse.x, mouse.y, -1 );
 
@@ -92,11 +93,13 @@
         
         vector =  vector.subSelf( origin ).normalize();
         
-        var scalar =(y - origin.y) / vector.y
+        var scalar = (y - origin.y) / vector.y
         var intersection = origin.clone().addSelf( vector.multiplyScalar(scalar) );
 
         return intersection;
     };
+
+
     //pass the event handling to proper stage
     Webgl.prototype.onEvent = function(){
         var self = this;

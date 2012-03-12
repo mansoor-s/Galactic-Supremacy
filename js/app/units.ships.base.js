@@ -8,7 +8,7 @@
         this._createGrid()
         //positioning
         this.speed = 10;
-        this.rotationSpeed = degreesToRadians(1)
+        this.rotationSpeed = App.Utill.degreesToRadians(1)
         this.position;
         this.rotation;
         
@@ -35,7 +35,7 @@
         //circle under the ship
         this.grid.circle = new THREE.Line( App.Resources.geometries.circle, App.Resources.materials.etc.gridDefault)
         //  this._grid.circle.position.set(ship.position.x, 0, ship.position.z);
-        this.grid.circle.rotation.x = degreesToRadians(90);
+        this.grid.circle.rotation.x = App.Utill.degreesToRadians(90);
         // this._grid.circle.scale = ship.scale.clone();
         // this._grid.circle.scale.multiplyScalar(ship.geometry.boundingSphere.radius);
           
@@ -48,7 +48,7 @@
         
         //future position circle
         this.grid.futureCircle  = new THREE.Line( App.Resources.geometries.circle, App.Resources.materials.etc.gridDefault)
-        this.grid.futureCircle.rotation.x = degreesToRadians(90);
+        this.grid.futureCircle.rotation.x = App.Utill.degreesToRadians(90);
         this.grid.futureCircle.scale = this.grid.circle.scale;
         this.grid.futureCircle.visible = false;
         

@@ -1,9 +1,8 @@
 (function() {
-var AI = App.AI = function(){
+    var AI = App.AI = function(){
     
     
     
-}
-
-})()
-//this file will be for calculations like path finding and movement and 
+    }
+})();
+//todo .this is just a placeholder for now

@@ -1,13 +1,17 @@
 (function() {
     "use strict";
-     var Resources = App.Resources = new function()  {
-        this.textures = {};
-    
-        this.lineTexture = function( options ) {
+    var Resources = App.Resources = new function()  {
+        this.materials = {};
+        this.geometries = {};
+        this.misc = {};
+        this.misc.rotationMatrix = new THREE.Matrix4();
+       
+        
+        this.lineMaterial = function( options ) {
             return new THREE.LineBasicMaterial(options);
         }
     
-        this.imageTexture = function( file, options, inImageDir ) {
+        this.imageMaterial = function( file, options, inImageDir ) {
             if ( file != undefined ) {
                 var loc = inImageDir ? "images/textures/" + file : file;
                 options.map = THREE.ImageUtils.loadTexture(loc);
@@ -15,76 +19,86 @@
             return new THREE.MeshLambertMaterial(options);
         }
     
-        this.basicTexture = function( options ) {
+        this.basicMaterial = function( options ) {
             return new THREE.MeshBasicMaterial(options);
         }
     
-        this.initialize = function() {
-            this.textures.planets = {
-                gas0: this.imageTexture("jupiter.jpg", {
+        this._initializeGeometries  = function(){
+            this.geometries.sphere = new THREE.SphereGeometry( 1, 64, 62 );
+            this.geometries.sphere.castShadow = true;
+            this.geometries.sphere.receiveShadow = true;
+       
+            var circleShape = new THREE.Shape();
+            circleShape.moveTo(0,0);
+            circleShape.arc( 0, 0, 1, 0, Math.PI * 2, false );
+            this.geometries.circle = circleShape.createPointsGeometry(60);
+        
+            this.geometries.verticalLine = new THREE.Geometry();
+            this.geometries.verticalLine.vertices.push( new THREE.Vertex(new THREE.Vector3( 0, 0, 0)));
+            this.geometries.verticalLine.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 1, 0)));
+        
+        
+            //todo correct it becouse its asynch
+            this.geometries.ships = {}
+            var loader = new THREE.JSONLoader();
+            loader.load( './models/Shipyard.js', $.proxy(function(geometry ) {
+                geometry.computeBoundingSphere();
+                this.geometries.ships['cruiser'] = geometry;
+            },this) );
+        
+        }    
+        
+          
+        
+        
+        this._initializeMaterials = function() {
+            this.materials.planets = {
+                gas0: this.imageMaterial("jupiter.jpg", {
                     overdraw: true
                 }, true),
-                gas1: this.imageTexture("saturn.jpg", {
+                gas1: this.imageMaterial("saturn.jpg", {
                     overdraw: true
                 }, true),
-                terran0: this.imageTexture("terran1.jpg", {
+                terran0: this.imageMaterial("terran1.jpg", {
                     ambient: 0x555555, 
                     color: 0x888888
                 }, true),
-                volcanic0: this.imageTexture("venus.jpg", { }, true),
-                desert0: this.imageTexture("desert1.jpg", {
+                volcanic0: this.imageMaterial("venus.jpg", { }, true),
+                desert0: this.imageMaterial("desert1.jpg", {
+                    ambient: 0x555555, 
+                    color: 0x888888
+                }, true),
+                barren0: this.imageMaterial("barren1.jpg", {
                     ambient: 0x555555, 
                     color: 0x888888
                 }, true)
             };
 
-            this.textures.moons = {
-                ice0: this.imageTexture(undefined, {
-                    ambient: 0x05555, 
-                    color: 0x008888
-                }),
-                barren0: this.imageTexture("barren1.jpg", {
-                    ambient: 0x555555, 
-                    color: 0x888888
-                }, true)
+            this.materials.stars = {
+                star0: this.imageMaterial( 'main_sequence_body.png' ,{},true) 
+                
             };
 
-            this.textures.stars = {
-                star0: this.basicTexture({
-                    map: THREE.ImageUtils.loadTexture( 'images/textures/main_sequence_body.png' ), 
-                    blending: THREE.AdditiveBlending, 
-                    overdraw: true
-                })
 
-            };
-
-            this.textures.etc = {
-                torus: this.imageTexture(undefined, {
-                    ambient: 0x008888, 
-                    color: 0x00ffff
-                }),
-                grid: this.lineTexture({
+            this.materials.etc = {
+                gridDefault: this.lineMaterial({
                     color: 0x293A45, 
-                    opacity: 0.9, 
-                    smooth: true
+                    opacity: 0.9
                 }), 
-                grid2: this.lineTexture({
+                
+                gridSelected: this.lineMaterial({
                     color: 0xff0000, 
-                    opacity: 0.9, 
-                    smooth: true
+                    opacity: 0.9
                 }),
-                wireframe: this.basicTexture({
-                    color: 0x293A45, 
-                    wireframe: true
-                }),
-                selector: this.basicTexture({
+                selector: this.imageMaterial("selector.png",{
                     transparent: true, 
                     overdraw: true, 
-                    doubleSided: true,
-                    map: THREE.ImageUtils.loadTexture( 'images/textures/selector.png' )
-                })
+                    doubleSided: true},true),
+                meshFace: new THREE.MeshFaceMaterial()
             };   
         
         } 
+        this._initializeMaterials();
+        this._initializeGeometries();
     }
 })();

@@ -1,6 +1,12 @@
 window.App = {
     Controllers: {},
-    Stages: {}
+    Stages: {},
+    Utilities: {},
+    Units: {
+        Ships: {}
+    },
+    Objects: {},
+    Parts: {}
 }
 App.settings = {
     version: 0.000,

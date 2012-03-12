@@ -21,7 +21,7 @@
         //todo use resources.
         this.grid  = new THREE.Line( App.Resources.geometries.circle, App.Resources.materials.etc.gridDefault )
         //  this._grid.circle.position.set(ship.position.x, 0, ship.position.z);
-        this.grid.rotation.x = degreesToRadians(90);
+        this.grid.rotation.x = App.Utill.degreesToRadians(90);
     }
     Planet.prototype.load = function(data,scene,parent){
         this.scene = scene;
@@ -47,10 +47,10 @@
         //set the position.and then rotate it...
         this.mesh.position.set(1,0,0).multiplyScalar(data.distance + parent.size);
             
-        App.Resources.misc.rotationMatrix.setRotationY(degreesToRadians(360 * data.orbit));
+        App.Resources.misc.rotationMatrix.setRotationY(App.Utill.degreesToRadians(360 * data.orbit));
         App.Resources.misc.rotationMatrix.multiplyVector3(this.mesh.position);
             
-      this.mesh.position.addSelf(parent.position);
+        this.mesh.position.addSelf(parent.position);
                 
         
         //adding orbit lines

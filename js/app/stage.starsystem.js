@@ -118,9 +118,9 @@
     }
     StarSystem.prototype.updateCamera = function(){
         var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
-        App.Resources.misc.rotationMatrix.setRotationX(degreesToRadians(this.cameraRotations.x));
+        App.Resources.misc.rotationMatrix.setRotationX(App.Utill.degreesToRadians(this.cameraRotations.x));
         distanceVector =  App.Resources.misc.rotationMatrix.multiplyVector3(distanceVector);
-        App.Resources.misc.rotationMatrix.setRotationY(degreesToRadians(this.cameraRotations.y));
+        App.Resources.misc.rotationMatrix.setRotationY(App.Utill.degreesToRadians(this.cameraRotations.y));
         distanceVector =  App.Resources.misc.rotationMatrix.multiplyVector3(distanceVector);
         
         this.camera.position.x = this.cameraLookTarget.x;
@@ -247,7 +247,7 @@
     StarSystem.prototype.onKeyDown =function(e){
         //left
         var yRot = this.cameraRotations.y, xRot = this.cameraRotations.x;
-        var turnUnits = 4;
+        var turnUnits = 2;
         if (e.keyCode === 17) {
             //ctrMouse.initX = currentMouse.x;
             //ctrMouse.initY = currentMouse.y;

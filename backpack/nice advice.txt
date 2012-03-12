@@ -1,2 +1,0 @@
-[19:09] <chandlerp> IvanKuzev: not in a normal way, however I just thought of a way to use multiple textures, and you could use that to set it to a fully transparent texture
-[19:10] <chandlerp> if you create a texture sprite, say 4 textures 2x2 you can update each particle's UV to match whichever texture you want

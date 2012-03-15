@@ -31,9 +31,9 @@
     //creates ship grid
     Base.prototype._createGrid = function(){
         
-        //todo use resources.
+        //todo use App.Res.
         //circle under the ship
-        this.grid.circle = new THREE.Line( App.Resources.geometries.circle, App.Resources.materials.etc.gridDefault)
+        this.grid.circle = new THREE.Line( App.Res.geometries.circle, App.Res.materials.etc.gridDefault)
         //  this._grid.circle.position.set(ship.position.x, 0, ship.position.z);
         this.grid.circle.rotation.x = App.Utill.degreesToRadians(90);
         // this._grid.circle.scale = ship.scale.clone();
@@ -41,19 +41,19 @@
           
         //line between y=0 and the ship
         //todo: move shipAnchorGeometry to common resource loader
-        this.grid.anchor = new THREE.Line(App.Resources.geometries.verticalLine,App.Resources.materials.etc.gridDefault)
+        this.grid.anchor = new THREE.Line(App.Res.geometries.verticalLine,App.Res.materials.etc.gridDefault)
         this.grid.anchor.position = this.grid.circle.position;
         //  shipAnchor.position.set(ship.position.x,ship.position.y, ship.position.z);
         //  shipAnchor.scale.multiplyScalar( -ship.position.y);
         
         //future position circle
-        this.grid.futureCircle  = new THREE.Line( App.Resources.geometries.circle, App.Resources.materials.etc.gridDefault)
+        this.grid.futureCircle  = new THREE.Line( App.Res.geometries.circle, App.Res.materials.etc.gridDefault)
         this.grid.futureCircle.rotation.x = App.Utill.degreesToRadians(90);
         this.grid.futureCircle.scale = this.grid.circle.scale;
         this.grid.futureCircle.visible = false;
         
         //future position line between y=0 and the ship
-        this.grid.futureAnchor = new THREE.Line(App.Resources.geometries.verticalLine,App.Resources.materials.etc.gridDefault)
+        this.grid.futureAnchor = new THREE.Line(App.Res.geometries.verticalLine,App.Res.materials.etc.gridDefault)
         //futureAnchor.scale.multiplyScalar( -ship.position.y);
         this.grid.futureAnchor.visible = false;
         
@@ -64,7 +64,7 @@
         connectingGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3()));
         connectingGeometry.dynamic = true;
         
-        this.grid.connectingLine = new THREE.Line(connectingGeometry,App.Resources.materials.etc.gridDefault)
+        this.grid.connectingLine = new THREE.Line(connectingGeometry,App.Res.materials.etc.gridDefault)
         this.grid.connectingLine.visible = false;
              
     };    //load data when the system loads
@@ -72,7 +72,7 @@
         this.scene = scene;
         //todo load appropriate mesh
        
-        this.mesh = new THREE.Mesh(App.Resources.geometries.ships[data.subtype],App.Resources.materials.etc.meshFace);
+        this.mesh = new THREE.Mesh(App.Res.geometries.ships[data.subtype],App.Res.materials.etc.meshFace);
         this.mesh.position.set(data.position.x, data.position.y, data.position.z);
         this.mesh.rotation.set(data.rotation.x, data.rotation.y, data.rotation.z);
         this.position = this.mesh.position;

@@ -1,11 +1,12 @@
 (function() {
     "use strict";
     var Carrier = App.Units.Ships.Carrier = function(){
-    this.turrets = [];
+  Carrier.inheritsFrom(App.Units.Ships.Base);  
+  this.turrets = [];
     this.fighters = [];
     
     }  
-    Carrier.inheritsFrom(App.Units.Ships.Base);
+  
   
    
     Carrier.prototype.launchFighters = function(){

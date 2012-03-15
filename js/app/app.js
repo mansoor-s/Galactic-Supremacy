@@ -1,7 +1,7 @@
 $(document).ready(function() {
     
     // initialize game
-    App.Controllers.App();
+   App.Res = new App.Resources(App.Controllers.App);
 
     $('a').hover(function(e) {
         e.preventDefault();

@@ -18,8 +18,8 @@
     }
     //loads on system load
     Planet.prototype._createGrid = function(){
-        //todo use resources.
-        this.grid  = new THREE.Line( App.Resources.geometries.circle, App.Resources.materials.etc.gridDefault )
+        //todo use App.Res.
+        this.grid  = new THREE.Line( App.Res.geometries.circle, App.Res.materials.etc.gridDefault )
         //  this._grid.circle.position.set(ship.position.x, 0, ship.position.z);
         this.grid.rotation.x = App.Utill.degreesToRadians(90);
     }
@@ -39,16 +39,16 @@
             //when parent is defined its a moon
             this.size = data.size = 100;
         }
-        this.mesh = new THREE.Mesh( App.Resources.geometries.sphere, 
-            App.Resources.materials.planets[data.map] );
+        this.mesh = new THREE.Mesh( App.Res.geometries.sphere, 
+            App.Res.materials.planets[data.map] );
         this.position = this.mesh.position;
        
         this.mesh.scale.multiplyScalar(data.size);
         //set the position.and then rotate it...
         this.mesh.position.set(1,0,0).multiplyScalar(data.distance + parent.size);
             
-        App.Resources.misc.rotationMatrix.setRotationY(App.Utill.degreesToRadians(360 * data.orbit));
-        App.Resources.misc.rotationMatrix.multiplyVector3(this.mesh.position);
+        App.Res.misc.rotationMatrix.setRotationY(App.Utill.degreesToRadians(360 * data.orbit));
+        App.Res.misc.rotationMatrix.multiplyVector3(this.mesh.position);
             
         this.mesh.position.addSelf(parent.position);
                 

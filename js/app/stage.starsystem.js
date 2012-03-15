@@ -57,7 +57,7 @@
     };
     
     StarSystem.prototype._initializeHelpers = function(){
-        this.planetSelector = new THREE.Mesh( App.Resources.geometries.sphere, App.Resources.materials.etc.selector );
+        this.planetSelector = new THREE.Mesh( App.Res.geometries.sphere, App.Res.materials.etc.selector );
         this.planetSelector.visible = false;
         this.scene.add(this.planetSelector);
     } 
@@ -78,8 +78,8 @@
         
         //adding solar objects
         var star = new THREE.Mesh(
-            App.Resources.geometries.sphere,
-            App.Resources.materials.stars[data.star.map]  
+            App.Res.geometries.sphere,
+            App.Res.materials.stars[data.star.map]  
             );
         //since default size of the meshes is 1 ..we just multiply
         //it by the size of the object
@@ -115,10 +115,10 @@
     }
     StarSystem.prototype.updateCamera = function(){
         var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
-        App.Resources.misc.rotationMatrix.setRotationX(App.Utill.degreesToRadians(this.cameraRotations.x));
-        distanceVector =  App.Resources.misc.rotationMatrix.multiplyVector3(distanceVector);
-        App.Resources.misc.rotationMatrix.setRotationY(App.Utill.degreesToRadians(this.cameraRotations.y));
-        distanceVector =  App.Resources.misc.rotationMatrix.multiplyVector3(distanceVector);
+        App.Res.misc.rotationMatrix.setRotationX(App.Utill.degreesToRadians(this.cameraRotations.x));
+        distanceVector =  App.Res.misc.rotationMatrix.multiplyVector3(distanceVector);
+        App.Res.misc.rotationMatrix.setRotationY(App.Utill.degreesToRadians(this.cameraRotations.y));
+        distanceVector =  App.Res.misc.rotationMatrix.multiplyVector3(distanceVector);
         
         this.camera.position.x = this.cameraLookTarget.x;
         this.camera.position.y = this.cameraLookTarget.y;

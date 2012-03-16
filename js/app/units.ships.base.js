@@ -33,23 +33,23 @@
         
         //todo use App.Res.
         //circle under the ship
-        this.grid.circle = new THREE.Line( App.Res.geometries.circle, App.Res.materials.etc.gridDefault)
+        this.grid.shipCircle = new THREE.Line( App.Res.geometries.circle, App.Res.materials.etc.gridDefault)
         //  this._grid.circle.position.set(ship.position.x, 0, ship.position.z);
-        this.grid.circle.rotation.x = App.Utill.degreesToRadians(90);
+        this.grid.shipCircle.rotation.x = App.Utill.degreesToRadians(90);
         // this._grid.circle.scale = ship.scale.clone();
         // this._grid.circle.scale.multiplyScalar(ship.geometry.boundingSphere.radius);
           
         //line between y=0 and the ship
         //todo: move shipAnchorGeometry to common resource loader
-        this.grid.anchor = new THREE.Line(App.Res.geometries.verticalLine,App.Res.materials.etc.gridDefault)
-        this.grid.anchor.position = this.grid.circle.position;
+        this.grid.shipAnchor = new THREE.Line(App.Res.geometries.verticalLine,App.Res.materials.etc.gridDefault)
+        this.grid.shipAnchor.position = this.grid.shipCircle.position;
         //  shipAnchor.position.set(ship.position.x,ship.position.y, ship.position.z);
         //  shipAnchor.scale.multiplyScalar( -ship.position.y);
         
         //future position circle
         this.grid.futureCircle  = new THREE.Line( App.Res.geometries.circle, App.Res.materials.etc.gridDefault)
         this.grid.futureCircle.rotation.x = App.Utill.degreesToRadians(90);
-        this.grid.futureCircle.scale = this.grid.circle.scale;
+        this.grid.futureCircle.scale = this.grid.shipCircle.scale;
         this.grid.futureCircle.visible = false;
         
         //future position line between y=0 and the ship
@@ -75,12 +75,14 @@
         this.mesh = new THREE.Mesh(App.Res.geometries.ships[data.subtype],App.Res.materials.etc.meshFace);
         this.mesh.position.set(data.position.x, data.position.y, data.position.z);
         this.mesh.rotation.set(data.rotation.x, data.rotation.y, data.rotation.z);
+        this.mesh.scale.set(100,100,100);
         this.position = this.mesh.position;
         this.rotation = this.mesh.rotation;
-        
+     
        
         //calculate grid positions
         this.grid.shipCircle.position.set(data.position.x,0,data.position.z);
+        this.grid.shipCircle.scale = this.mesh.scale;
         this.grid.shipAnchor.scale.multiplyScalar(data.position.y);
                
         scene.add(this.mesh);

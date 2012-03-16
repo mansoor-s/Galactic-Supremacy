@@ -52,7 +52,7 @@
        
       
         this.loadSystem(systemData);
-    // this.loadShips(systemData);
+        this.loadShips(systemData);
    
     };
     

@@ -108,13 +108,15 @@
 
         this.materials.etc = {
             gridDefault: this.lineMaterial({
-                color: 0x293A45, 
-                opacity: 0.9
+                color: 0x293A45
             }), 
                 
             gridSelected: this.lineMaterial({
-                color: 0xff0000, 
-                opacity: 0.9
+                color: 0xff0000
+            }),
+            
+            gridHover: this.lineMaterial({
+                color: 0xffff00
             }),
             selector: this.imageMaterial("selector.png",{
                 transparent: true, 

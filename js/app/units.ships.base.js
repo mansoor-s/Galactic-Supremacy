@@ -11,6 +11,8 @@
         this.rotationSpeed = App.Utill.degreesToRadians(1)
         this.position;
         this.rotation;
+        this.selected = false;
+        this.hovered = false;
         
         this.controllable = true;
     
@@ -75,7 +77,8 @@
         this.mesh = new THREE.Mesh(App.Res.geometries.ships[data.subtype],App.Res.materials.etc.meshFace);
         this.mesh.position.set(data.position.x, data.position.y, data.position.z);
         this.mesh.rotation.set(data.rotation.x, data.rotation.y, data.rotation.z);
-        this.mesh.scale.set(100,100,100);
+        this.mesh.scale.set(10,10,10);
+        this.mesh.tag = this;
         this.position = this.mesh.position;
         this.rotation = this.mesh.rotation;
      
@@ -98,11 +101,39 @@
     }
     //selects this ship
     Base.prototype.select= function(){
+        this.selected = true;
+        this.grid.shipCircle.material = App.Res.materials.etc.gridSelected;
+        this.grid.shipAnchor.material = App.Res.materials.etc.gridSelected;
         
     }
     //deselects ship
     Base.prototype.deselect= function(){
-        
+        this.selected = false;
+        if(this.hovered){
+            this.grid.shipCircle.material = App.Res.materials.etc.gridHover;
+            this.grid.shipAnchor.material = App.Res.materials.etc.gridHover;
+        }else{
+            this.grid.shipCircle.material = App.Res.materials.etc.gridDefault;
+            this.grid.shipAnchor.material = App.Res.materials.etc.gridDefault;
+        }
+    }
+    //hover management
+    Base.prototype.hover = function(){
+        this.hovered = true;
+        this.grid.shipCircle.material = App.Res.materials.etc.gridHover;
+        this.grid.shipAnchor.material = App.Res.materials.etc.gridHover;
+    
+    }
+    //hover management
+    Base.prototype.unhover = function(){
+        this.hovered = false;
+        if(this.selected){
+            this.grid.shipCircle.material = App.Res.materials.etc.gridSelected;
+            this.grid.shipAnchor.material = App.Res.materials.etc.gridSelected;
+        }else{
+            this.grid.shipCircle.material = App.Res.materials.etc.gridDefault;
+            this.grid.shipAnchor.material = App.Res.materials.etc.gridDefault;
+        }
     }
     //issue order to move
     Base.prototype.moveTo= function(vector3){

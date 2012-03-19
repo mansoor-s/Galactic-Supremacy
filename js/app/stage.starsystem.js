@@ -17,7 +17,8 @@
         
         
         //keeps the intersected object for now
-        this.SELECTED = [];
+        this.selectedPlanet;
+        this.selectedShips = [];
        
         //ships and planets arrays
         this.ships = [];
@@ -28,6 +29,7 @@
         this.planets = this.planetPool.inUse;
 
         this.events = {
+            'dblclick':'onDoubleClick',
             'keydown': 'onKeyDown',
             'keyup': 'onKeyUp',
             "click": 'onMouseClick',
@@ -52,10 +54,15 @@
        
       
         this.loadSystem(systemData);
-    // this.loadShips(systemData);
+        this.loadShips(systemData);
    
     };
-    
+    StarSystem.prototype.onDoubleClick = function(event){
+        var clickedPosition = this._controller.getIntersectionWithYPlane(this.camera,this.mouse,0);
+        new TWEEN.Tween( this.cameraLookTarget)
+        .to(clickedPosition, 1500)
+        .start()
+    }
     StarSystem.prototype._initializeHelpers = function(){
         this.planetSelector = new THREE.Mesh( App.Res.geometries.sphere, App.Res.materials.etc.selector );
         this.planetSelector.visible = false;
@@ -151,15 +158,15 @@
         var $viewport = this._controller.$viewport;
         this.mouse.x = ( event.offsetX / $viewport.width()) * 2 - 1;
         this.mouse.y = - ( event.offsetY / $viewport.height()) * 2 + 1;
-    
+        this.hoverOnOneShip();
     }
     
     StarSystem.prototype.selectPlanet= function(planetObject){
         this.planetSelector.position = planetObject.position.clone();
-        var size = planetObject.scale.clone();
+        var size = planetObject.mesh.scale.clone();
         size.multiplyScalar(1.01);
         this.planetSelector.scale = size;
-        this.SELECTED.push(planetObject);
+        this.selectedPlanet = planetObject;
         this.planetSelector.visible = true;
         new TWEEN.Tween( this.cameraLookTarget )
         .to(planetObject.position, 1500 )
@@ -169,29 +176,45 @@
         this.planetSelector.visible = false;
     }
     StarSystem.prototype.selectShip= function(shipObject){
-        this.SELECTED.push(shipObject);
-        shipObject.tag.shipCircle.material = this.materials.etc.gridSelected;
-        shipObject.tag.shipAnchor.material = this.materials.etc.gridSelected;
+        this.selectedShips.push(shipObject);
+        shipObject.select();
         new TWEEN.Tween( this.cameraLookTarget )
         .to(shipObject.position, 1500 )
         .start()
     }
-    StarSystem.prototype.deselectShip= function(shipObject){
-        shipObject.tag.shipCircle.material = this.materials.etc.gridDefault;
-        shipObject.tag.shipAnchor.material = this.materials.etc.gridDefault;
+    StarSystem.prototype.deselectAll = function(){
+        if(this.selectedPlanet !== undefined) this.deselectPlanet(this.selectedPlanet);
+        for(var i = 0;i<this.selectedShips.length;i++){
+            this.selectedShips[i].deselect();
+        }
+        this.selectedPlanet = undefined;
+        this.selectedShips = [];
         
     }
-    
-    StarSystem.prototype.deselectAll = function(){
-        for(var i = 0;i<this.SELECTED.length;i++){
-            if($.inArray(this.SELECTED[i], this.planets)!== -1){
-                this.deselectPlanet(this.SELECTED[i]);
-            }else if ($.inArray(this.SELECTED[i], this.ships)!== -1){
-                this.deselectShip(this.SELECTED[i]);
+    StarSystem.prototype.hoverOnOneShip = function(){
+        for(var i = 0;i<this.ships.length;i++){
+            if(this.ships[i].hovered) this.ships[i].unhover();
+        }
+        
+        // find intersections
+        var vector = new THREE.Vector3( this.mouse.x, this.mouse.y, 1 );
+        this._controller.projector.unprojectVector( vector, this.camera );
+        //use three.ray to find intersecting geometry
+        var ray = new THREE.Ray( this.camera.position, vector.subSelf( this.camera.position ).normalize() );
+        var intersects = ray.intersectObjects( this.scene.children );
+        
+        if ( intersects.length > 0 ) {
+            
+            for(var i = 0;i<intersects.length;i++){
+                if (intersects[ i ].object.visible === true){
+                 
+                    if(intersects[ i ].object.tag instanceof App.Units.Ships.Base){
+                        intersects[ i ].object.tag.hover();
+                    }
+                    break;
+                }                
             }
         }
-        this.SELECTED = [];
-        
     }
     StarSystem.prototype.onMouseClick = function(event){
         // find intersections
@@ -202,14 +225,19 @@
         var intersects = ray.intersectObjects( this.scene.children );
         
         if ( intersects.length > 0 ) {
-            if ( this.SELECTED != intersects[ 0 ].object ) {
-                if($.inArray(intersects[ 0 ].object, this.planets) !== -1){
-                    this.deselectAll();
-                    this.selectPlanet(intersects[ 0 ].object);
-                }else if($.inArray(intersects[ 0 ].object, this.ships) !== -1) {
-                    this.deselectAll();
-                    this.selectShip(intersects[ 0 ].object);
-                }
+            
+            for(var i = 0;i<intersects.length;i++){
+                if (intersects[ i ].object.visible === true){
+                 
+                    if(intersects[ i ].object.tag instanceof App.Units.Ships.Base){
+                        this.deselectAll();
+                        this.selectShip(intersects[ i ].object.tag);
+                    }else if(intersects[ i ].object.tag instanceof App.Objects.Planet){
+                        this.deselectAll();
+                        this.selectPlanet(intersects[ i ].object.tag);
+                    }
+                    break;
+                }                
             }
         } else {
             this.deselectAll();
@@ -242,7 +270,7 @@
     };
 
     StarSystem.prototype.onKeyDown =function(e){
-        //left
+        
         var yRot = this.cameraRotations.y, xRot = this.cameraRotations.x;
         var turnUnits = 2;
         if (e.keyCode === 17) {
@@ -270,11 +298,11 @@
             } else {
                 xRot = this.cameraRotations.x - turnUnits;
             }
-        //add
+        //numpad +
         } else if (e.keyCode === 107) {
             this.zoomIn();
    
-        //subtract
+        //numpad -
         } else if (e.keyCode === 109) {
             this.zoomOut();
         }

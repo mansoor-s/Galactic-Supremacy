@@ -51,7 +51,7 @@
         App.Res.misc.rotationMatrix.multiplyVector3(this.mesh.position);
             
         this.mesh.position.addSelf(parent.position);
-                
+        this.mesh.tag =this; 
         
         //adding orbit lines
         this.grid.scale.multiplyScalar(data.distance + parent.size)

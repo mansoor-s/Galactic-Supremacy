@@ -46,6 +46,9 @@
         this.$viewport.on('mousedown mouseup mousemove dblclick click mousewheel', this.onEvent());
         $(document).live('keydown keyup keypress', this.onEvent());
 
+        //setup event loop
+
+
         this.animate();
     };
 
@@ -65,6 +68,19 @@
     Webgl.prototype.update = function() {
         this.currentStage.update();
     };
+
+
+
+    /*
+        Event loop function.
+            Called every `n` milliseconds
+
+    */
+    Webgl.prototype.eventLoop = function() {
+        
+    };
+
+
 
     /*
     function render

@@ -94,18 +94,18 @@
         scene.add(this.grid.shipAnchor);
         scene.add(this.grid.futureCircle);
         scene.add(this.grid.futureAnchor);
-    }
+    };
     // updates every frame
     Base.prototype.update= function(){
         
-    }
+    };
     //selects this ship
     Base.prototype.select= function(){
         this.selected = true;
         this.grid.shipCircle.material = App.Res.materials.etc.gridSelected;
         this.grid.shipAnchor.material = App.Res.materials.etc.gridSelected;
         
-    }
+    };
     //deselects ship
     Base.prototype.deselect= function(){
         this.selected = false;
@@ -116,14 +116,14 @@
             this.grid.shipCircle.material = App.Res.materials.etc.gridDefault;
             this.grid.shipAnchor.material = App.Res.materials.etc.gridDefault;
         }
-    }
+    };
     //hover management
     Base.prototype.hover = function(){
         this.hovered = true;
         this.grid.shipCircle.material = App.Res.materials.etc.gridHover;
         this.grid.shipAnchor.material = App.Res.materials.etc.gridHover;
     
-    }
+    };
     //hover management
     Base.prototype.unhover = function(){
         this.hovered = false;
@@ -134,19 +134,19 @@
             this.grid.shipCircle.material = App.Res.materials.etc.gridDefault;
             this.grid.shipAnchor.material = App.Res.materials.etc.gridDefault;
         }
-    }
+    };
     //issue order to move
     Base.prototype.moveTo= function(vector3){
         
-    }
+    };
     //issue order to face a target
     Base.prototype.rotateTo= function(vector3){
         
-    }
+    };
     // issue order to rotate
     Base.prototype.rotate= function(vector3){
         
-    }
+    };
     Base.prototype.onReturnToPool = function(){
         if (this.scene!==null){
             this.scene.remove(this.grid.connectingLine);
@@ -157,5 +157,7 @@
             this.scene.remove(this.mesh)
             this.scene = null;
         }
-    }
+    };
+
+
 })();

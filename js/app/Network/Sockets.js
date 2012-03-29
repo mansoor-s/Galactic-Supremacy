@@ -64,7 +64,7 @@
         Function: _onOpen
             Private. Event listene for onopen event.
     */
-    Scokets.prototype._onOpen = function() {
+    Sockets.prototype._onOpen = function() {
         if (typeof this._openFn === 'function') {
             this._openFn();
         }
@@ -82,7 +82,7 @@
         var dat;
         try {
             dat = JSON.parse(data);
-        } cath(e) {
+        } catch(e) {
             dat = data;
         }
         if (this._useQueue) {

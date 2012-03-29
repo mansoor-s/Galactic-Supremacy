@@ -1,5 +1,6 @@
 (function() {
-    "use strict";
+    'use strict';
+    
     var Webgl = App.Controllers.Webgl = function($viewport) {
         this.$viewport = $viewport;
 
@@ -12,9 +13,6 @@
         this.MAX_FRAME_SKIP = 10,
         this.SKIP_TICKS = 1000 / this.FPS;
        
-        this.renderer;
-        this.projector;
-
         // Create projector
         this.projector = new THREE.Projector();
 
@@ -46,11 +44,12 @@
         this.$viewport.on('mousedown mouseup mousemove dblclick click mousewheel', this.onEvent());
         $(document).live('keydown keyup keypress', this.onEvent());
 
-        //setup event loop
-
+        //setup animation event loop
 
         this.animate();
     };
+
+
 
     Webgl.prototype.animate = function() {
         var self = this;
@@ -61,23 +60,14 @@
         })();
     };
 
+
+
     /*
     function update
     Handles game state updates
     */
     Webgl.prototype.update = function() {
         this.currentStage.update();
-    };
-
-
-
-    /*
-        Event loop function.
-            Called every `n` milliseconds
-
-    */
-    Webgl.prototype.eventLoop = function() {
-        
     };
 
 
@@ -99,6 +89,8 @@
         // Render our scene
         this.currentStage.render();
     };
+
+
 
     //gets position in the z plane of a givent mouse coordinates
     Webgl.prototype.getIntersectionWithYPlane = function(camera, mouse, y) {
@@ -122,6 +114,25 @@
         return function(event, delta) {
             self.currentStage.onEvent(event, delta);
         };
+        
+    };
+
+    Webgl.prototype.handleUnitUpdates = function() {
+        
+    };
+
+
+    Webgl.prototype.handlePlayerUpdates = function() {
+        
+    };
+
+
+    Webgl.prototype.handlePrivateChat = function() {
+        
+    };
+
+
+    Webgl.prototype.handleAllianceChat = function() {
         
     };
 })();

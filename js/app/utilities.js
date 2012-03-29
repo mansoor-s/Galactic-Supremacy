@@ -1,5 +1,5 @@
 (function() {
-    "use strict";
+    'use strict';
     var Utill = App.Utill = {};
 
     Utill.degreesToRadians = function(degrees) {
@@ -9,24 +9,6 @@
     Utill.radiansToDegrees = function(radians){
         return (radians) * (180 / Math.PI);
     };
-
-    Function.prototype.inheritsFrom = function( parentClassOrObject ){ 
-        if ( parentClassOrObject.constructor == Function ) 
-        { 
-            //Normal Inheritance 
-            this.prototype = new parentClassOrObject;
-            this.prototype.constructor = this;
-            this.prototype.parentClass = parentClassOrObject.prototype;
-        } 
-        else 
-        { 
-            //Pure Virtual Inheritance 
-            this.prototype = parentClassOrObject;
-            this.prototype.constructor = this;
-            this.prototype.parentClass = parentClassOrObject;
-        } 
-        return this;
-    } 
 
     //prepares a matrix for the postoscreen function
     Utill.posToScreenPrepare = function(camera){

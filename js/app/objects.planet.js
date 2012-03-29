@@ -1,5 +1,5 @@
 (function() {
-    "use strict";
+    'use strict';
     var Planet = App.Objects.Planet = function(){
         this.mesh = null;
         this.scene = null;
@@ -16,14 +16,18 @@
         this.type;
         this.owner;
     }
+
+    
     //loads on system load
     Planet.prototype._createGrid = function(){
         //todo use App.Res.
-        this.grid  = new THREE.Line( App.Res.geometries.circle, App.Res.materials.etc.gridDefault )
+        this.grid  = new THREE.Line(App.Res.geometries.circle, App.Res.materials.etc.gridDefault)
         //  this._grid.circle.position.set(ship.position.x, 0, ship.position.z);
         this.grid.rotation.x = App.Utill.degreesToRadians(90);
     }
-    Planet.prototype.load = function(data,scene,parent){
+
+
+    Planet.prototype.load = function(data, scene, parent){
         this.scene = scene;
         if(parent === undefined){
             parent = {
@@ -35,12 +39,12 @@
                 size:0             
             };          
             this.size = data.size;
-        }else{
+        } else {
             //when parent is defined its a moon
             this.size = data.size = 100;
         }
-        this.mesh = new THREE.Mesh( App.Res.geometries.sphere, 
-            App.Res.materials.planets[data.map] );
+
+        this.mesh = new THREE.Mesh( App.Res.geometries.sphere, App.Res.materials.planets[data.map] );
         this.position = this.mesh.position;
        
         this.mesh.scale.multiplyScalar(data.size);
@@ -63,18 +67,26 @@
         scene.add(this.mesh);
         scene.add(this.grid);
     }
+
+
     //updates every frame
     Planet.prototype.update = function(){
         
     }
+
+
     //selected by user
     Planet.prototype.select = function(){
         
     }
+
+
     //deselected by user
     Planet.prototype.deselect = function(){
         
     }
+
+
     Planet.prototype.onReturnToPool = function(){
         if (this.scene!==null){
             this.scene.remove(this.grid);

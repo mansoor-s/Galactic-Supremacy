@@ -1,5 +1,5 @@
 (function() {
-    "use strict";
+    'use strict';
     
     /*
         Function: Sockets
@@ -120,7 +120,8 @@
             <flush>
     */
     Sockets.prototype.recv = function() {
-        return this._recvArr;
+        //make a shallow copy
+        return this._recvArr.slice(0);
     };
 
 

@@ -1,6 +1,11 @@
 (function() {
-    "use strict";
+    'use strict';
     App.Controllers.App = function() {
-        new App.Controllers.Webgl($('.gs-viewport'));
+        var webglController = new App.Controllers.Webgl($('.gs-viewport'));
+
+        var eventLoop = new App.eventLoop(webglController);
+
+        eventLoop.start();
+        
     };
 })();

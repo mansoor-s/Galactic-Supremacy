@@ -117,22 +117,51 @@
         
     };
 
-    Webgl.prototype.handleUnitUpdates = function() {
-        
+
+
+/*
+
+    task ids:
+
+    0 - unit movement
+    1 - unit position update
+    2 - player/infrustrcuture updates
+    3 - private chat
+    4 - alliance chat
+
+*/
+    Webgl.prototype.routeUpdateEvents = function(tasks) {
+        for(var i = 0, len = tasks.length; i < len; ++i) {
+            var task = tasks[i];
+            
+            if (task.id === 0 || task.id === 1) {
+                this.currentStage.handleUnitUpdates(task.task);
+            } else if (task.id === 2) {
+                this.currentStage.handlePlayerUpdates(task.task);
+            } else if (task.id === 3) {
+                this.currentStage.handlePrivateChat(task.task);
+            } else if (task.id === 4) {
+                this.currentStage.handleAllianceChat(task.task);
+            }
+        }
+    };
+
+    Webgl.prototype.handleUnitUpdates = function(data) {
+        this.currentStage.handleUnitUpdates(data);
     };
 
 
-    Webgl.prototype.handlePlayerUpdates = function() {
-        
+    Webgl.prototype.handlePlayerUpdates = function(data) {
+        this.currentStage.handlePlayerUpdates(data);
     };
 
 
-    Webgl.prototype.handlePrivateChat = function() {
-        
+    Webgl.prototype.handlePrivateChat = function(data) {
+        this.currentStage.handlePrivateChat(data);
     };
 
 
-    Webgl.prototype.handleAllianceChat = function() {
-        
+    Webgl.prototype.handleAllianceChat = function(data) {
+        this.currentStage.handleAllianceChat(data);
     };
 })();

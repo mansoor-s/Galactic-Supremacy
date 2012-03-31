@@ -13,27 +13,36 @@
     };
 
     EventLoop.prototype._getEventLoop = function() {
+
+        var x = 2780;
+        var y = 50;
+        var z = 50;
+
         var self = this;
         return function() {
+            x -= 1;
+            y -= 1;
+            z -= 1;
+
             var tasks = self.sockets.recv();
             self.sockets.flush();
 
+            tasks.push({
+                id: 0,
+                task: {
+                    unitId: 0,
+                    order: 0,
+                    pos: {
+                        x: x,
+                        y: y,
+                        z: z
+                    }
+                }
+
+            });
 
             //route the tasks
-
-            for(var i = 0, len = tasks.length; i < len; ++i) {
-                var task = tasks[i];
-                
-                if (task.id === 0 || task.id === 1) {
-                    self._webglController.handleUnitUpdates(task);
-                } else if (task.id === 2) {
-                    self._webglController.handlePlayerUpdates(task);
-                } else if (task.id === 3) {
-                    self._webglController.handlePrivateChat(task);
-                } else if (task.id === 4) {
-                    self._webglController.handleAllianceChat(task);
-                }
-            }
+            self._webglController.routeUpdateEvents(tasks);
 
         };
     };
@@ -57,7 +66,7 @@ tasks: [
         id: 0,
         task: {
             order: 0
-            destinaion: {
+            pos: {
                 x:
                 y:
                 z:

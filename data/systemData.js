@@ -94,6 +94,7 @@ systemData = {
     ships:[
     {
         type:"frigate",
+        id: 0,
         subtype:"cruiser",
         position:{
             x:2780,
@@ -109,6 +110,7 @@ systemData = {
     {
         type:"frigate",
         subtype:"cruiser",
+        id: 1,
         position:{
             x:2820,
             y:50,
@@ -123,6 +125,7 @@ systemData = {
     {
         type:"frigate",
         subtype:"cruiser",
+        id: 2,
         position:{
             x:2800,
             y:50,

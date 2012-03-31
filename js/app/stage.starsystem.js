@@ -1,5 +1,5 @@
 (function() {
-    "use strict";
+    'use strict';
     var StarSystem = App.Stages.StarSystem = function(webglController) {
         this._controller = webglController;
         this.scene;
@@ -22,6 +22,7 @@
        
         //ships and planets arrays
         this.ships = [];
+
         this.fighterPool = new App.Utilities.Pool(App.Units.Ships.Fighter);
         this.carrierPool = new App.Utilities.Pool(App.Units.Ships.Carrier);
         this.frigatePool = new App.Utilities.Pool(App.Units.Ships.Frigate);
@@ -37,6 +38,7 @@
             'mousemove': 'onMouseMove'
         };
         
+
         // Initialize camera
         this.camera = new THREE.PerspectiveCamera( 45, this._controller.$viewport.width() / this._controller.$viewport.height(), 1, 999999 );
         //camera control
@@ -57,17 +59,22 @@
         this.loadShips(systemData);
    
     };
+
+
     StarSystem.prototype.onDoubleClick = function(event){
         var clickedPosition = this._controller.getIntersectionWithYPlane(this.camera,this.mouse,0);
         new TWEEN.Tween( this.cameraLookTarget)
         .to(clickedPosition, 1500)
         .start()
-    }
+    };
+
+
     StarSystem.prototype._initializeHelpers = function(){
         this.planetSelector = new THREE.Mesh( App.Res.geometries.sphere, App.Res.materials.etc.selector );
         this.planetSelector.visible = false;
         this.scene.add(this.planetSelector);
-    } 
+    };
+
     
     StarSystem.prototype._initializeLights = function(){
         var ambient = new THREE.AmbientLight( 0xffffff ); 
@@ -78,6 +85,7 @@
         pointLight.shadowCameraFov = 360;
         this.scene.add(pointLight);
     };
+
 
     StarSystem.prototype.loadSystem = function(data) {
          
@@ -109,6 +117,8 @@
             }
         }
     };
+
+
     StarSystem.prototype.loadShips = function(data){
         this.fighterPool.freeAll();
         this.frigatePool.freeAll();
@@ -119,7 +129,9 @@
             ship.load(data.ships[i],this.scene);
             this.ships.push(ship);    
         }
-    }
+    };
+
+
     StarSystem.prototype.updateCamera = function(){
         var distanceVector = new THREE.Vector3(0,0,-this.cameraDistance);
         App.Res.misc.rotationMatrix.setRotationX(App.Utill.degreesToRadians(this.cameraRotations.x));
@@ -134,13 +146,16 @@
         this.camera.position.addSelf(distanceVector);
         
         this.camera.lookAt(this.cameraLookTarget);
-    }
+    };
+
+
     StarSystem.prototype.update = function(){
         //updating camera position depending on controlls
         this.updateCamera();
         
         TWEEN.update();
     };
+
 
     StarSystem.prototype.render = function(){
         //not used
@@ -159,7 +174,8 @@
         this.mouse.x = ( event.offsetX / $viewport.width()) * 2 - 1;
         this.mouse.y = - ( event.offsetY / $viewport.height()) * 2 + 1;
         this.hoverOnOneShip();
-    }
+    };
+
     
     StarSystem.prototype.selectPlanet= function(planetObject){
         this.planetSelector.position = planetObject.position.clone();
@@ -171,17 +187,23 @@
         new TWEEN.Tween( this.cameraLookTarget )
         .to(planetObject.position, 1500 )
         .start()
-    }
+    };
+
+
     StarSystem.prototype.deselectPlanet= function(planetObject){
         this.planetSelector.visible = false;
-    }
+    };
+
+
     StarSystem.prototype.selectShip= function(shipObject){
         this.selectedShips.push(shipObject);
         shipObject.select();
         new TWEEN.Tween( this.cameraLookTarget )
         .to(shipObject.position, 1500 )
         .start()
-    }
+    };
+
+
     StarSystem.prototype.deselectAll = function(){
         if(this.selectedPlanet !== undefined) this.deselectPlanet(this.selectedPlanet);
         for(var i = 0;i<this.selectedShips.length;i++){
@@ -190,9 +212,11 @@
         this.selectedPlanet = undefined;
         this.selectedShips = [];
         
-    }
+    };
+
+
     StarSystem.prototype.hoverOnOneShip = function(){
-        for(var i = 0;i<this.ships.length;i++){
+        for(var i = 0; i < this.ships.length; i++){
             if(this.ships[i].hovered) this.ships[i].unhover();
         }
         
@@ -215,7 +239,42 @@
                 }                
             }
         }
-    }
+    };
+
+
+
+    /*
+        unitOrders: [
+        0: move      specify vector, distance, speed
+        1: stop      
+        3: rotate    specify x, y and z
+        4: fire      specify target location
+
+    ]
+    */
+    StarSystem.prototype.handleUnitUpdates = function(update) {
+        var order = update.order;
+        var unitId = update.unitId;
+
+        if (order === 0) {
+            var ship = this.getUnit(unitId);
+            ship.moveTo(update.pos);
+            
+        }
+    };
+
+
+    StarSystem.prototype.getUnit = function(id) {
+        for (var i = 0, len = this.ships.length; i < len; ++i) {
+
+            if (this.ships[i].id == id) {
+                return this.ships[i];
+            }
+        }
+    };
+
+
+
     StarSystem.prototype.onMouseClick = function(event){
         // find intersections
         var vector = new THREE.Vector3( this.mouse.x, this.mouse.y, 1 );
@@ -226,13 +285,13 @@
         
         if ( intersects.length > 0 ) {
             
-            for(var i = 0;i<intersects.length;i++){
+            for(var i = 0; i < intersects.length; i++){
                 if (intersects[ i ].object.visible === true){
                  
                     if(intersects[ i ].object.tag instanceof App.Units.Ships.Base){
                         this.deselectAll();
                         this.selectShip(intersects[ i ].object.tag);
-                    }else if(intersects[ i ].object.tag instanceof App.Objects.Planet){
+                    } else if(intersects[ i ].object.tag instanceof App.Objects.Planet){
                         this.deselectAll();
                         this.selectPlanet(intersects[ i ].object.tag);
                     }
@@ -252,8 +311,7 @@
         .to({
             cameraDistance: newDistance
 
-        }, 500 )
-        .start();
+        }, 500 ).start();
     };
 
 
@@ -264,10 +322,10 @@
         .to({
             cameraDistance: newDistance
 
-        }, 500 )
-        .start();
+        }, 500 ).start();
 
     };
+
 
     StarSystem.prototype.onKeyDown =function(e){
         
@@ -315,9 +373,11 @@
         .start();
     };
 
+
     StarSystem.prototype.onKeyUp = function(e){
         
     };
+
 
     StarSystem.prototype.onMouseWheel = function(event,delta){
         event.preventDefault();
@@ -327,8 +387,8 @@
         } else{                                                      
             this.zoomOut();            
         }
-
     };
+
 
     StarSystem.prototype.onEvent = function(event, delta){
 

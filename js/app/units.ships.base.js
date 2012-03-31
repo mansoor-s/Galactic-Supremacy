@@ -29,6 +29,8 @@
         this.owner = '';
     
         this.orders = [];
+
+        this.id = '';
     }
     //creates ship grid
     Base.prototype._createGrid = function(){
@@ -69,11 +71,14 @@
         this.grid.connectingLine = new THREE.Line(connectingGeometry,App.Res.materials.etc.gridDefault)
         this.grid.connectingLine.visible = false;
              
-    };    //load data when the system loads
-    Base.prototype.load = function(data,scene){
+    };    
+
+    //load data when the system loads
+    Base.prototype.load = function(data, scene){
         this.scene = scene;
         //todo load appropriate mesh
        
+        this.id = data.id;
         this.mesh = new THREE.Mesh(App.Res.geometries.ships[data.subtype],App.Res.materials.etc.meshFace);
         this.mesh.position.set(data.position.x, data.position.y, data.position.z);
         this.mesh.rotation.set(data.rotation.x, data.rotation.y, data.rotation.z);
@@ -95,10 +100,14 @@
         scene.add(this.grid.futureCircle);
         scene.add(this.grid.futureAnchor);
     };
+
+
     // updates every frame
     Base.prototype.update= function(){
         
     };
+
+
     //selects this ship
     Base.prototype.select= function(){
         this.selected = true;
@@ -106,6 +115,8 @@
         this.grid.shipAnchor.material = App.Res.materials.etc.gridSelected;
         
     };
+
+
     //deselects ship
     Base.prototype.deselect= function(){
         this.selected = false;
@@ -117,6 +128,8 @@
             this.grid.shipAnchor.material = App.Res.materials.etc.gridDefault;
         }
     };
+
+
     //hover management
     Base.prototype.hover = function(){
         this.hovered = true;
@@ -124,6 +137,8 @@
         this.grid.shipAnchor.material = App.Res.materials.etc.gridHover;
     
     };
+
+
     //hover management
     Base.prototype.unhover = function(){
         this.hovered = false;
@@ -135,18 +150,32 @@
             this.grid.shipAnchor.material = App.Res.materials.etc.gridDefault;
         }
     };
+
+
     //issue order to move
-    Base.prototype.moveTo= function(vector3){
-        
+    Base.prototype.moveTo = function(pos){
+        new TWEEN.Tween( this.position )
+            .to({
+                x: pos.x,
+                y: pos.y,
+                z: pos.z
+
+            }, 250 ).start();
     };
+
+
     //issue order to face a target
-    Base.prototype.rotateTo= function(vector3){
+    Base.prototype.rotateTo = function(vector3){
         
     };
+
+
     // issue order to rotate
-    Base.prototype.rotate= function(vector3){
+    Base.prototype.rotate = function(vector3){
         
     };
+
+
     Base.prototype.onReturnToPool = function(){
         if (this.scene!==null){
             this.scene.remove(this.grid.connectingLine);

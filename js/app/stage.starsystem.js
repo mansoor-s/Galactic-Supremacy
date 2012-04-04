@@ -88,7 +88,6 @@
 
 
     StarSystem.prototype.loadSystem = function(data) {
-         
         
         
         //adding solar objects
@@ -168,11 +167,25 @@
 
 
     StarSystem.prototype.onMouseMove = function(event){
-    
+        var x = 0;
+        var y = 0;
+        var totalOffsetLeft = 0;
+        var totalOffsetTop = 0 ;
+        
+        var element = event.target;
+        
+        while (element.offsetParent)
+        {
+          totalOffsetLeft += element.offsetLeft;
+          totalOffsetTop += element.offsetTop;
+          element = element.offsetParent;
+        }
+        x = event.pageX - totalOffsetLeft;
+        y = event.pageY - totalOffsetTop;
 
         var $viewport = this._controller.$viewport;
-        this.mouse.x = ( event.offsetX / $viewport.width()) * 2 - 1;
-        this.mouse.y = - ( event.offsetY / $viewport.height()) * 2 + 1;
+        this.mouse.x = ( x / $viewport.width()) * 2 - 1;
+        this.mouse.y = - ( y / $viewport.height()) * 2 + 1;
         this.hoverOnOneShip();
     };
 
@@ -391,7 +404,7 @@
 
 
     StarSystem.prototype.onEvent = function(event, delta){
-
+        
         for (var type in this.events){
             if (event.type === type){
                 this[this.events[type]](event,delta); 

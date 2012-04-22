@@ -21,6 +21,6 @@ $(document).ready(function() {
     
     $('.gs-dialog').draggable({
         handle: $('.gs-dialogHeader')    
-    });
+    }).show();
     
 });

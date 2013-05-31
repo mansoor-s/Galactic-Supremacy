@@ -91,8 +91,8 @@
             size: this.starSize, 
             map: THREE.ImageUtils.loadTexture( "images/sprite2.png" ),
             vertexColors: true,
-            //blending:THREE.AdditiveBlending,
-            //             depthTest:false,
+            blending:THREE.AdditiveBlending,
+                         depthTest:false,
             alphaTest: .9
         } );
 

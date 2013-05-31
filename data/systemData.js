@@ -2,7 +2,7 @@
 systemData = {
     star: {
         type: "g",
-        size: 300,
+        size: 500,
         map: "star0"
     },
     planets: [

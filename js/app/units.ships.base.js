@@ -40,13 +40,15 @@
         this.grid.shipCircle = new THREE.Line( App.Res.geometries.circle, App.Res.materials.etc.gridDefault)
         //  this._grid.circle.position.set(ship.position.x, 0, ship.position.z);
         this.grid.shipCircle.rotation.x = App.Utill.degreesToRadians(90);
+        this.grid.shipCircle.visible = false;
         // this._grid.circle.scale = ship.scale.clone();
         // this._grid.circle.scale.multiplyScalar(ship.geometry.boundingSphere.radius);
           
         //line between y=0 and the ship
         //todo: move shipAnchorGeometry to common resource loader
-        this.grid.shipAnchor = new THREE.Line(App.Res.geometries.verticalLine,App.Res.materials.etc.gridDefault)
+        this.grid.shipAnchor = new THREE.Line(App.Res.geometries.verticalLine, App.Res.materials.etc.gridDefault)
         this.grid.shipAnchor.position = this.grid.shipCircle.position;
+        this.grid.shipAnchor.visible = false;
         //  shipAnchor.position.set(ship.position.x,ship.position.y, ship.position.z);
         //  shipAnchor.scale.multiplyScalar( -ship.position.y);
         
@@ -89,9 +91,10 @@
      
        
         //calculate grid positions
-        this.grid.shipCircle.position.set(data.position.x,0,data.position.z);
+        //this.grid.shipCircle.position = this.position;//.set(data.position.x,0,data.position.z);
+        this.grid.shipCircle.position.set(this.position.x, 0, this.position.z)
         this.grid.shipCircle.scale = this.mesh.scale;
-        this.grid.shipAnchor.scale.multiplyScalar(data.position.y);
+        this.grid.shipAnchor.scale.multiplyScalar(this.position.y);
                
         scene.add(this.mesh);
         scene.add(this.grid.connectingLine);
@@ -103,22 +106,25 @@
 
 
     // updates every frame
-    Base.prototype.update= function(){
+    Base.prototype.update = function(){
         
     };
 
 
     //selects this ship
-    Base.prototype.select= function(){
+    Base.prototype.select = function(){
         this.selected = true;
         this.grid.shipCircle.material = App.Res.materials.etc.gridSelected;
         this.grid.shipAnchor.material = App.Res.materials.etc.gridSelected;
+
+        this.grid.shipAnchor.visible = true;
+        this.grid.shipCircle.visible = true;
         
     };
 
 
     //deselects ship
-    Base.prototype.deselect= function(){
+    Base.prototype.deselect = function(){
         this.selected = false;
         if(this.hovered){
             this.grid.shipCircle.material = App.Res.materials.etc.gridHover;
@@ -127,6 +133,8 @@
             this.grid.shipCircle.material = App.Res.materials.etc.gridDefault;
             this.grid.shipAnchor.material = App.Res.materials.etc.gridDefault;
         }
+        this.grid.shipAnchor.visible = false;
+        this.grid.shipCircle.visible = false;
     };
 
 
@@ -135,7 +143,6 @@
         this.hovered = true;
         this.grid.shipCircle.material = App.Res.materials.etc.gridHover;
         this.grid.shipAnchor.material = App.Res.materials.etc.gridHover;
-    
     };
 
 
@@ -154,13 +161,19 @@
 
     //issue order to move
     Base.prototype.moveTo = function(pos){
+        var self = this;
         new TWEEN.Tween( this.position )
             .to({
                 x: pos.x,
                 y: pos.y,
                 z: pos.z
 
-            }, 250 ).start();
+            }, 250 ).start().onUpdate(function(value) {
+                var yPos = self.position.y;
+                self.grid.shipAnchor.scale.set(0, yPos, 0);
+
+                self.grid.shipCircle.position.set(pos.x + value, 0, pos.y + value);
+            });
     };
 
 
@@ -177,7 +190,7 @@
 
 
     Base.prototype.onReturnToPool = function(){
-        if (this.scene!==null){
+        if (this.scene !== null){
             this.scene.remove(this.grid.connectingLine);
             this.scene.remove(this.grid.shipCircle);
             this.scene.remove(this.grid.shipAnchor);

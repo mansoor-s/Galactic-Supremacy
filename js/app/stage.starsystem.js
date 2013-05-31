@@ -203,12 +203,12 @@
     };
 
 
-    StarSystem.prototype.deselectPlanet= function(planetObject){
+    StarSystem.prototype.deselectPlanet = function(planetObject){
         this.planetSelector.visible = false;
     };
 
 
-    StarSystem.prototype.selectShip= function(shipObject){
+    StarSystem.prototype.selectShip = function(shipObject){
         this.selectedShips.push(shipObject);
         shipObject.select();
         new TWEEN.Tween( this.cameraLookTarget )

@@ -117,8 +117,8 @@
         this.rotationMatrix.setRotationX(App.Utill.degreesToRadians(this.cameraRotations.x));
         this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
         
-        //this.rotationMatrix.setRotationY(App.Utill.degreesToRadians(this.cameraRotations.y));
-        //this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
+        this.rotationMatrix.setRotationY(App.Utill.degreesToRadians(this.cameraRotations.y));
+        this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
 
         this.rotationMatrix.setRotationZ(App.Utill.degreesToRadians(this.cameraRotations.z));
         this.distanceVector = this.rotationMatrix.multiplyVector3(distanceVector);
@@ -160,10 +160,16 @@
 
         //left
         }else if (e.keyCode === 37) {
-            this.cameraRotations.z -= turnUnits;
+            //this.cameraRotations.z -= turnUnits;
+            //var rads = Utill.degreesToRadians(this.cameraRotations.z)
+            this.cameraRotations.z += Math.cos(turnUnits);
+            this.cameraRotations.x -= Math.cos(turnUnits );
+            this.cameraRotations.y -= Math.tan(turnUnits);
         //right
         }else if (e.keyCode === 39) {
-            this.cameraRotations.z += turnUnits;
+            this.cameraRotations.z -= Math.cos(turnUnits);
+            this.cameraRotations.x += Math.cos(turnUnits );
+            this.cameraRotations.y += Math.tan(turnUnits);
         //up
         }else if (e.keyCode === 38) {
             this.cameraRotations.x += turnUnits;

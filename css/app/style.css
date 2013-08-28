@@ -1,0 +1,67 @@
+html {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+	background: black;
+}
+
+.gs-container {
+    height: 100%;
+    width: 100%;
+    display: block;
+    background-color: #080808;
+    color: #e4f0f3;
+    min-width: 900px;
+    font-family: 'Iceland', cursive;
+    overflow: hidden;
+}
+
+.gs-viewport {
+    height: 100%;
+    width: 100%;
+    z-index: -10;
+    overflow: hidden;
+}
+
+.star {
+    width: 3px;
+    height: 3px;
+    background: #43515b;
+    position: absolute;
+    border-radius: 2px;
+    box-shadow:0 0 2px #43515b; 
+}
+
+
+.gs-uiOverlay {
+    z-index: 5;
+}
+
+
+.tile {
+    display: block;
+    background: gray;
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border: 1px solid white;
+}
+
+.gs-zoomOverlay {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    position: absolute;
+    display: none;
+}
+
+canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+}

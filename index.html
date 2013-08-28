@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+        <title>Galactic Supremacy</title>
+        <link href="./css/lib/reset.css" rel="stylesheet">
+        <link href="./css/lib/ui-lightness/jquery-ui-1.8.16.custom.css" rel="stylesheet">
+        <link href="http://fonts.googleapis.com/css?family=Signika" rel="stylesheet" type="text/css">
+        <link href="http://fonts.googleapis.com/css?family=Iceland" rel="stylesheet" type="text/css">
+        <link href="./css/app/style.css" rel="stylesheet">
+        <link href="./css/app/menu.css" rel="stylesheet">
+        <link href="./css/app/hud.css" rel="stylesheet">
+        <link href="./css/app/zoomSlider.css" rel="stylesheet">
+        <link href="./css/app/dialog.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="gs-container">
+            <div class="gs-mainMenu gs-uiOverlay">
+                <div class="gs-menuMain">
+                    <ul class="gs-subMenu">
+                        <li class="gs-subMenu1"><a href="#">Notes</a></li>
+                        <li class="gs-subMenu2"><a href="#">Account</a></li>
+                        <li class="gs-subMenu3"><a href="#">Settings</a></li>
+                        <li class="gs-subMenu4"><a href="#">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="gs-topHUD gs-uiOverlay">
+                <ul class="gs-topHUD-icons">
+                    <li>
+                        <a href="#" class="gs-topHUDIconImg gs-topHUDIconImg-mail"></a>
+                        <a href="#">(1)</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="gs-zoomSliderContainer gs-uiOverlay">
+                <div class="gs-zoomSliderTopIcon"></div>
+                <div class="gs-zoomSlider"></div>
+                <div class="gs-zoomSliderBottomIcon"></div>
+            </div>
+            <div class="gs-viewport">
+            </div>
+
+            <!-----
+            <div class="gs-dialog">
+                <div class="gs-dialogHeader">Test Dialog</div>
+            </div>
+
+            -->
+            <div class="gs-zoomOverlay"></div>
+
+        </div>
+
+        <script src="./js/lib/jquery-1.7.1.min.js"></script>
+        <script src="./js/lib/jquery-ui-1.8.16.custom.min.js"></script>
+        <script src="./js/lib/jquery.mousewheel.js"></script>
+        <script src="./js/lib/underscore.js"></script>
+        <script src="./js/lib/Three.js"></script>
+        <script src="./js/lib/RequestAnimationFrame.js"></script>
+        <script src="./js/lib/Stats.js"></script>
+        <script src="./js/lib/Tween.js"></script>
+        
+        <script src="./js/lib/SimplexNoise.js"></script>
+        <script src="./js/lib/postprocessing/EffectComposer.js"></script>
+        <script src="./js/lib/postprocessing/ShaderExtras.js"></script>
+        <script src="./js/lib/postprocessing/ShaderPass.js"></script>
+        <script src="./js/lib/postprocessing/RenderPass.js"></script>
+        <script src="./js/lib/postprocessing/MaskPass.js"></script>
+        <script src="./js/lib/postprocessing/BloomPass.js"></script>
+
+        <script src="./data/systemData.js"></script>
+
+
+        <script src="./js/app/Settings.js"></script>
+        <script src="./js/app/Resources.js"></script>
+        <script src="./js/app/utilities.js"></script>
+        <script src="./js/app/utilities.pool.js"></script>
+
+        <script src="./js/app/objects.planet.js"></script>
+        <script src="./js/app/units.ships.base.js"></script>
+        <script src="./js/app/units.ships.fighter.js"></script>
+        <script src="./js/app/units.ships.frigate.js"></script>
+        <script src="./js/app/units.ships.carrier.js"></script>
+        <script src="./js/app/parts.turret.js"></script>
+
+
+
+        <script src="./js/app/HyperEngine.js"></script>
+        <script src="./js/app/EventLoop.js"></script>
+        <script type="text/javascript" src="./js/app/controlers.app.js"></script>
+        <script type="text/javascript" src="./js/app/Network/Network.js"></script>
+        <script type="text/javascript" src="./js/app/Network/Sockets.js"></script>
+
+        <script type="text/javascript" src="./js/app/controlers.webgl.js"></script>
+        <script type="text/javascript" src="./js/app/stage.galaxy.js"></script>
+        <script type="text/javascript" src="./js/app/stage.starsystem.js"></script>
+
+        <script src="./js/app/app.js"></script>
+    </body>
+</html>

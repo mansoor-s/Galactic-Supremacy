@@ -1,0 +1,45 @@
+.gs-topHUD {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 800px;
+    height: 40px;
+    color: #e4f0f3;
+    background: rgba(41, 58, 69, .4);
+    border-radius: 5px;
+    padding-left: 10px;
+}
+.gs-topHUD a {
+    text-decoration: none;
+    color: inherit;
+    font-family: 'Signika', sans-serif;
+    font-size: 14px;
+    vertical-align: bottom;
+    
+}
+
+.gs-topHUD-icons {
+    list-style-type: none;
+}
+
+.gs-topHUD-icons li {
+    width: 80px;
+    display: inline;
+}
+
+.gs-topHUDIconImg {
+    display: block;
+    width: 30px;
+    height: 30px;
+    background: red;
+    display: inline-block;
+}
+
+.gs-topHUDIconImg-mail {
+    background: url(../../images/icons/email.png) no-repeat;
+}
+
+.gs-unitSelection {
+    background: pink;
+    border: 1px solid blue;
+}

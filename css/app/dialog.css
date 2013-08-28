@@ -1,0 +1,27 @@
+.gs-dialog {
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    z-index: 99;
+    border: 1px solid #293a45;
+    background: rgba(0, 0, 0, .7);
+    top: 50%;
+    left: 50%;
+    margin-left: -250px;
+    margin-top: -250px;
+    border-radius: 2px;
+    display: none;
+    box-shadow: 6px 6px 19px #000000;
+}
+
+.gs-dialogHeader {
+    font-family: 'Signika', sans-serif;
+    font-size: 16px;
+    border-bottom: 1px solid #293a45;
+    height: 1.5em;
+    border-radius: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    overflow: hidden;
+    color: #43515b;
+}
